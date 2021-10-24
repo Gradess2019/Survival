@@ -13,7 +13,7 @@ class ASurvivalCharacter : public AGLibGASCharacter
 	GENERATED_BODY()
 
 public:
-	ASurvivalCharacter();
+	ASurvivalCharacter(const FObjectInitializer& ObjectInitializer);
 
 private:
 	/** Camera boom positioning the camera behind the character */
