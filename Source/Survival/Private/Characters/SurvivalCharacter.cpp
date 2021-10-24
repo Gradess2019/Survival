@@ -39,7 +39,6 @@ ASurvivalCharacter::ASurvivalCharacter(const FObjectInitializer& ObjectInitializ
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	FollowCamera->bUsePawnControlRotation = false;
 
-	// Attributes = CreateDefaultSubobject<UPlayerAttributeSet>(TEXT("AttributeSet"));
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -56,7 +55,7 @@ void ASurvivalCharacter::SetupPlayerInputComponent(class UInputComponent* Player
 
 void ASurvivalCharacter::MoveForward(float Value)
 {
-	if ((Controller != nullptr) && (Value != 0.0f))
+	if (Controller != nullptr && Value != 0.0f)
 	{
 		// find out which way is forward
 		const FRotator Rotation = CameraBoom->GetRelativeRotation();
@@ -70,7 +69,7 @@ void ASurvivalCharacter::MoveForward(float Value)
 
 void ASurvivalCharacter::MoveRight(float Value)
 {
-	if ((Controller != nullptr) && (Value != 0.0f))
+	if (Controller != nullptr && Value != 0.0f)
 	{
 		// find out which way is right
 		const FRotator Rotation = CameraBoom->GetRelativeRotation();

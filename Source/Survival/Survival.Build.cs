@@ -15,13 +15,14 @@ public class Survival : ModuleRules
 			"Engine", 
 			"InputCore", 
 			"GradessGASLibrary",
+			"GameplayAbilities",
+			"GameplayTags",
+			"GameplayTasks"
 		});
 		
 		PrivateDependencyModuleNames.AddRange(new string[]
 		{
-			"GameplayAbilities",
-			"GameplayTags",
-			"GameplayTags"
+			
 		});
 	}
 }
