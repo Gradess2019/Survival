@@ -14,7 +14,15 @@ public class Survival : ModuleRules
 			"CoreUObject", 
 			"Engine", 
 			"InputCore", 
-			"GradessGASLibrary"
+			"GradessGASLibrary",
+			"GameplayAbilities",
+			"GameplayTags",
+			"GameplayTasks"
+		});
+		
+		PrivateDependencyModuleNames.AddRange(new string[]
+		{
+			
 		});
 	}
 }
