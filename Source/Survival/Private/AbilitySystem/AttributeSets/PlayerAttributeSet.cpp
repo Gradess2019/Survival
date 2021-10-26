@@ -9,7 +9,7 @@ void UPlayerAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCall
 {
 	Super::PostGameplayEffectExecute(Data);
 	
-	if (Data.EvaluatedData.Attribute == GetEnduranceAttribute())
+	if (Data.EvaluatedData.Attribute == GetMovementSpeedAttribute())
 	{
 		SetMovementSpeed(FMath::Clamp(GetMovementSpeed(), 0.f, GetMaxMovementSpeed()));
 	}
