@@ -11,6 +11,10 @@ void UPlayerAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCall
 	
 	if (Data.EvaluatedData.Attribute == GetEnduranceAttribute())
 	{
+		SetMovementSpeed(FMath::Clamp(GetMovementSpeed(), 0.f, GetMaxMovementSpeed()));
+	}
+	else if (Data.EvaluatedData.Attribute == GetEnduranceAttribute())
+	{
 		SetEndurance(FMath::Clamp(GetEndurance(), 0.f, GetMaxEndurance()));
 	}
 	else if (Data.EvaluatedData.Attribute == GetThirstAttribute())
@@ -27,12 +31,24 @@ void UPlayerAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
+	DOREPLIFETIME_CONDITION_NOTIFY(UPlayerAttributeSet, MovementSpeed, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UPlayerAttributeSet, MaxMovementSpeed, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UPlayerAttributeSet, Endurance, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UPlayerAttributeSet, MaxEndurance, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UPlayerAttributeSet, Thirst, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UPlayerAttributeSet, MaxThirst, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UPlayerAttributeSet, Hunger, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UPlayerAttributeSet, MaxHunger, COND_None, REPNOTIFY_Always);
+}
+
+void UPlayerAttributeSet::OnRep_MovementSpeed(const FGameplayAttributeData& OldValue)
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UPlayerAttributeSet, MovementSpeed, OldValue);
+}
+
+void UPlayerAttributeSet::OnRep_MaxMovementSpeed(const FGameplayAttributeData& OldValue)
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UPlayerAttributeSet, MaxMovementSpeed, OldValue);
 }
 
 void UPlayerAttributeSet::OnRep_Endurance(const FGameplayAttributeData& OldValue)

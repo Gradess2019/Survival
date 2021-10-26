@@ -17,6 +17,22 @@ class SURVIVAL_API UPlayerAttributeSet : public UGLibBaseAttributeSet
 public:
 	UPROPERTY(
 		BlueprintReadOnly,
+		ReplicatedUsing = OnRep_MovementSpeed,
+		Category = "Attributes"
+	)
+	FGameplayAttributeData MovementSpeed;
+	ATTRIBUTE_ACCESSORS(UPlayerAttributeSet, MovementSpeed);
+
+	UPROPERTY(
+		BlueprintReadOnly,
+		ReplicatedUsing = OnRep_MaxMovementSpeed,
+		Category = "Attributes"
+	)
+	FGameplayAttributeData MaxMovementSpeed;
+	ATTRIBUTE_ACCESSORS(UPlayerAttributeSet, MaxMovementSpeed);
+
+	UPROPERTY(
+		BlueprintReadOnly,
 		ReplicatedUsing = OnRep_Endurance,
 		Category = "Attributes"
 	)
@@ -69,6 +85,12 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 
 protected:
+	UFUNCTION()
+	void OnRep_MovementSpeed(const FGameplayAttributeData& OldValue);
+
+	UFUNCTION()
+	void OnRep_MaxMovementSpeed(const FGameplayAttributeData& OldValue);
+
 	UFUNCTION()
 	void OnRep_Endurance(const FGameplayAttributeData& OldValue);
 

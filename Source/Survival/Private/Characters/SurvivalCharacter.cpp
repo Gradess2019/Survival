@@ -38,7 +38,6 @@ ASurvivalCharacter::ASurvivalCharacter(const FObjectInitializer& ObjectInitializ
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	FollowCamera->bUsePawnControlRotation = false;
-
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -51,6 +50,22 @@ void ASurvivalCharacter::SetupPlayerInputComponent(class UInputComponent* Player
 
 	PlayerInputComponent->BindAxis("MoveForward", this, &ASurvivalCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &ASurvivalCharacter::MoveRight);
+}
+
+void ASurvivalCharacter::OnMovementSpeedChanged(const FOnAttributeChangeData& NewValue)
+{
+	GetCharacterMovement()->MaxWalkSpeed = NewValue.NewValue;
+}
+
+void ASurvivalCharacter::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	const auto PlayerSet = GenericGetAttributes<UPlayerAttributeSet>();
+	
+	AbilitySystemComponent
+		->GetGameplayAttributeValueChangeDelegate(PlayerSet->GetMovementSpeedAttribute())
+		.AddUObject(this, &ASurvivalCharacter::OnMovementSpeedChanged);
 }
 
 void ASurvivalCharacter::MoveForward(float Value)
