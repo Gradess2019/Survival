@@ -15,6 +15,7 @@ public class Survival : ModuleRules
 			"Engine", 
 			"InputCore", 
 			"GradessGASLibrary",
+			"GradessLibraryRuntime",
 			"GameplayAbilities",
 			"GameplayTags",
 			"GameplayTasks"
@@ -24,5 +25,15 @@ public class Survival : ModuleRules
 		{
 			
 		});
+		
+		if (Target.bBuildDeveloperTools || (Target.Configuration != UnrealTargetConfiguration.Shipping && Target.Configuration != UnrealTargetConfiguration.Test))
+		{
+			PrivateDependencyModuleNames.Add("GameplayDebugger");
+			PublicDefinitions.Add("WITH_GAMEPLAY_DEBUGGER=1");
+		}
+		else
+		{
+			PublicDefinitions.Add("WITH_GAMEPLAY_DEBUGGER=0");
+		}
 	}
 }
