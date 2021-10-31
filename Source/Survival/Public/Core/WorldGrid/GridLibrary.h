@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "GridDirectionEnum.h"
-#include "UObject/Object.h"
 #include "GridLibrary.generated.h"
 
 UCLASS()
@@ -36,4 +35,16 @@ public:
 		)
 	)
 	static EGridDirection GetGridDirectionForActor(AActor* ActorToUse);
+
+	UFUNCTION(
+		BlueprintPure,
+		Category = "GridLibrary",
+		meta = (
+			DisplayName = "ClampDirectionToGrid(Vector)",
+			AutoCreateRefTerm = "Direction",
+			CompactNodeTitle = "Clamp to grid",
+			BlueprintAutocast
+		)
+	)
+	static FVector ClampDirectionToGrid(const FVector& Direction);
 };

@@ -1,8 +1,8 @@
 ﻿// Copyright Gradess. All Rights Reserved.
 
-#include "Core/WorldGrid/GridLibrary.h"
 #if WITH_GAMEPLAY_DEBUGGER
 #include "Debugger/GridDebuggerCategory.h"
+#include "Core/WorldGrid/GridLibrary.h"
 
 FGridDebuggerCategory::FGridDebuggerCategory()
 {

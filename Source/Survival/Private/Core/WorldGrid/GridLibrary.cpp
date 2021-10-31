@@ -33,3 +33,17 @@ EGridDirection UGridLibrary::GetGridDirectionForActor(AActor* ActorToUse)
 
 	return GetGridDirection(ActorToUse->GetActorForwardVector());
 }
+
+FVector UGridLibrary::ClampDirectionToGrid(const FVector& Direction)
+{
+	const auto GridDirection = GetGridDirection(Direction);
+	switch (GridDirection)
+	{
+	case EGridDirection::None: return FVector::ZeroVector;
+	case EGridDirection::North: return FVector::ForwardVector;
+	case EGridDirection::South: return FVector::BackwardVector;
+	case EGridDirection::West: return FVector::LeftVector;
+	case EGridDirection::East: return FVector::RightVector;
+	default: return FVector::ZeroVector;
+	}
+}
