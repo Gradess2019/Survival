@@ -40,11 +40,35 @@ public:
 		BlueprintPure,
 		Category = "GridLibrary",
 		meta = (
-			DisplayName = "ClampDirectionToGrid(Vector)",
+			DisplayName = "ClampDirectionToGrid (Vector)",
 			AutoCreateRefTerm = "Direction",
 			CompactNodeTitle = "Clamp to grid",
 			BlueprintAutocast
 		)
 	)
 	static FVector ClampDirectionToGrid(const FVector& Direction);
+
+	UFUNCTION(
+		BlueprintPure,
+		Category = "GridLibrary",
+		meta = (
+			DisplayName = "ToVector (GridDirection)",
+			AutoCreateRefTerm = "Direction",
+			CompactNodeTitle = "->",
+			BlueprintAutocast
+		)
+	)
+	static FVector GetDirectionFromGridDirection(const EGridDirection Direction);
+
+	UFUNCTION(
+		BlueprintPure,
+		Category = "GridLibrary",
+		meta = (
+			DisplayName = "ToRotation (GridDirection)",
+			AutoCreateRefTerm = "WorldDirection",
+			CompactNodeTitle = "->",
+			BlueprintAutocast
+		)
+	)
+	static FRotator GetRotationFromGridDirection(const EGridDirection Direction);
 };
