@@ -3,6 +3,13 @@
 
 #include "Core/WorldGrid.h"
 
+#include "Core/WorldGrid/GridCell.h"
+#include "Core/WorldGrid/IntVector2D.h"
+
+DEFINE_LOG_CATEGORY(LogWorldGrid);
+#define LOG(Format, ...) UE_LOG(LogWorldGrid, Log, TEXT(Format), ##__VA_ARGS__)
+#define WARN(Format, ...) UE_LOG(LogWorldGrid, Warning, TEXT(Format), ##__VA_ARGS__)
+#define ERROR(Format, ...) UE_LOG(LogWorldGrid, Error, TEXT(Format), ##__VA_ARGS__)
 
 AWorldGrid::AWorldGrid()
 {
@@ -38,8 +45,39 @@ void AWorldGrid::SpawnTiles(int32 X, int32 Y)
 	{
 		for (int32 CurrentX = -HalfX; CurrentX < HalfX; ++CurrentX)
 		{
-			auto InstanceLocation = FVector(CurrentX * CellSize, CurrentY * CellSize, 0.f);
-			InstancedStaticMeshComponent->AddInstance(FTransform(InstanceLocation));
+			CreateCell(FIntVector2D(CurrentX * CellSize, CurrentY * CellSize));
 		}
 	}
+}
+
+UGridCell* AWorldGrid::CreateCell(const FIntVector2D& Key)
+{
+	const auto NewCellPtr = Cells.Find(Key);
+	if (NewCellPtr) { return *NewCellPtr; }
+
+	const auto NewCell = NewObject<UGridCell>();
+	Cells.Add(Key, NewCell);
+
+	if (bDebug)
+	{
+		CreateDebugMeshForCell(Key);
+	}
+
+	return NewCell;
+}
+
+void AWorldGrid::CreateDebugMeshForCell(const FIntVector2D& Location)
+{
+	const auto CellPtr = Cells.Find(Location);
+	if (!CellPtr) { return; }
+
+	const auto Id = InstancedStaticMeshComponent->AddInstance(FTransform(Location));
+
+	const auto Cell = *CellPtr;
+	Cell->MeshId = Id;
+}
+
+TMap<FIntVector2D, UGridCell*> AWorldGrid::GetCells() const
+{
+	return Cells;
 }
