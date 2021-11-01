@@ -5,6 +5,7 @@
 
 #include "Core/WorldGrid/GridCell.h"
 #include "Core/WorldGrid/IntVector2D.h"
+#include "Kismet/KismetMathLibrary.h"
 
 DEFINE_LOG_CATEGORY(LogWorldGrid);
 #define LOG(Format, ...) UE_LOG(LogWorldGrid, Log, TEXT(Format), ##__VA_ARGS__)
@@ -31,6 +32,39 @@ void AWorldGrid::BeginPlay()
 	}
 }
 
+#pragma region IGrid implementation
+UGridCell* AWorldGrid::CreateCell_Implementation(const FIntVector2D& Key)
+{
+	const auto NewCellPtr = Cells.Find(Key);
+	if (NewCellPtr) { return *NewCellPtr; }
+
+	const auto NewCell = NewObject<UGridCell>();
+	Cells.Add(Key, NewCell);
+
+	if (bDebug)
+	{
+		CreateDebugMeshForCell(Key);
+	}
+
+	return NewCell;
+}
+
+FVector AWorldGrid::SnapLocation_Implementation(const FVector& Vector)
+{
+	return UKismetMathLibrary::Vector_SnappedToGrid(Vector, CellSize);
+}
+
+TMap<FIntVector2D, UGridCell*> AWorldGrid::GetCells_Implementation() const
+{
+	return Cells;
+}
+
+int32 AWorldGrid::GetGridSize_Implementation()
+{
+	return CellSize;
+}
+#pragma endregion IGrid implementation
+
 void AWorldGrid::SpawnTiles(int32 X, int32 Y)
 {
 	if (!IsValid(InstancedStaticMeshComponent))
@@ -50,22 +84,6 @@ void AWorldGrid::SpawnTiles(int32 X, int32 Y)
 	}
 }
 
-UGridCell* AWorldGrid::CreateCell(const FIntVector2D& Key)
-{
-	const auto NewCellPtr = Cells.Find(Key);
-	if (NewCellPtr) { return *NewCellPtr; }
-
-	const auto NewCell = NewObject<UGridCell>();
-	Cells.Add(Key, NewCell);
-
-	if (bDebug)
-	{
-		CreateDebugMeshForCell(Key);
-	}
-
-	return NewCell;
-}
-
 void AWorldGrid::CreateDebugMeshForCell(const FIntVector2D& Location)
 {
 	const auto CellPtr = Cells.Find(Location);
@@ -75,9 +93,4 @@ void AWorldGrid::CreateDebugMeshForCell(const FIntVector2D& Location)
 
 	const auto Cell = *CellPtr;
 	Cell->MeshId = Id;
-}
-
-TMap<FIntVector2D, UGridCell*> AWorldGrid::GetCells() const
-{
-	return Cells;
 }

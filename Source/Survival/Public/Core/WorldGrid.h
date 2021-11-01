@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "WorldGrid/Grid.h"
 #include "WorldGrid/IntVector2D.h"
 #include "WorldGrid.generated.h"
 
@@ -17,7 +18,7 @@ UCLASS(
 	Blueprintable,
 	BlueprintType
 )
-class SURVIVAL_API AWorldGrid : public AActor
+class SURVIVAL_API AWorldGrid : public AActor, public IGrid
 {
 	GENERATED_BODY()
 
@@ -32,14 +33,6 @@ protected:
 		Category = "WorldGrid|Debug"
 	)
 	bool bDebug;
-
-	UPROPERTY
-	(
-		EditAnywhere,
-		BlueprintReadOnly,
-		Category = "WorldGrid|Debug"
-	)
-	int32 CellSize;
 
 	UPROPERTY(
 		EditAnywhere,
@@ -59,32 +52,36 @@ protected:
 	UInstancedStaticMeshComponent* InstancedStaticMeshComponent;
 #pragma endregion DebugProperties
 
+	UPROPERTY
+	(
+		EditAnywhere,
+		BlueprintReadOnly,
+		Category = "WorldGrid|Debug"
+	)
+	int32 CellSize;
+
 	UPROPERTY(
-		BlueprintGetter = "GetCells",
+		BlueprintReadOnly,
 		Category = "WorldGrid|Debug"
 	)
 	TMap<FIntVector2D, UGridCell*> Cells;
 
 public:
 	virtual void BeginPlay() override;
-	void CreateDebugMeshForCell(const FIntVector2D& Location);
+
+#pragma region IGrid implementation
+	virtual UGridCell* CreateCell_Implementation(const FIntVector2D& Key) override;
+	virtual FVector SnapLocation_Implementation(const FVector& Vector) override;
+	virtual TMap<FIntVector2D, UGridCell*> GetCells_Implementation() const override;
+	virtual int32 GetGridSize_Implementation() override;
+#pragma endregion IGrid implementation
 
 	UFUNCTION()
 	void SpawnTiles(int32 X, int32 Y);
 
 	UFUNCTION(
-		BlueprintGetter,
-		Category = "WorldGrid"
-	)
-	TMap<FIntVector2D, UGridCell*> GetCells() const;
-
-	UFUNCTION(
 		BlueprintCallable,
-		Category = "WorldGrid",
-		meta = (
-			AutoCreateRefTerm = "Key"
-		)
+		Category = "WorldGrid|Debug"
 	)
-	UGridCell* CreateCell(const FIntVector2D& Key);
-
+	void CreateDebugMeshForCell(const FIntVector2D& Location);
 };
