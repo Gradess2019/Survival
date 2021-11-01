@@ -58,7 +58,7 @@ protected:
 		BlueprintReadOnly,
 		Category = "WorldGrid|Debug"
 	)
-	int32 CellSize;
+	int32 GridSize;
 
 	UPROPERTY(
 		BlueprintReadOnly,
@@ -71,6 +71,8 @@ public:
 
 #pragma region IGrid implementation
 	virtual UGridCell* CreateCell_Implementation(const FIntVector2D& Key) override;
+	virtual UGridCell* GetCellByLocationAndDirection_Implementation(const FVector& Location, EGridDirection Direction, const int32 Id) override;
+	virtual FVector GetCellLocation_Implementation(const FVector& Location, EGridDirection Direction, const int32 Id) override;
 	virtual FVector SnapLocation_Implementation(const FVector& Vector) override;
 	virtual TMap<FIntVector2D, UGridCell*> GetCells_Implementation() const override;
 	virtual int32 GetGridSize_Implementation() override;

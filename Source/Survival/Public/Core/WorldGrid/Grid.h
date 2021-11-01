@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GridDirectionEnum.h"
 #include "IntVector2D.h"
 #include "UObject/Interface.h"
 #include "Grid.generated.h"
@@ -32,6 +33,34 @@ public:
 	)
 	UGridCell* CreateCell(const FIntVector2D& Key);
 
+	UFUNCTION(
+		BlueprintCallable,
+		BlueprintNativeEvent,
+		Category = "Grid",
+		meta = (
+			AutoCreateRefTerm = "Location"
+		)
+	)
+	UGridCell* GetCellByLocationAndDirection(
+		const FVector& Location,
+		const EGridDirection Direction,
+		const int32 Id = 1
+	);
+
+	UFUNCTION(
+		BlueprintCallable,
+		BlueprintNativeEvent,
+		Category = "Grid",
+		meta = (
+			AutoCreateRefTerm = "Location"
+		)
+	)
+	FVector GetCellLocation(
+		const FVector& Location,
+		const EGridDirection Direction,
+		const int32 Id = 1
+	);
+	
 	UFUNCTION(
 		BlueprintCallable,
 		BlueprintNativeEvent,

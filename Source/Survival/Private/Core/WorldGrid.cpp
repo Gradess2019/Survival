@@ -17,7 +17,8 @@ AWorldGrid::AWorldGrid()
 	PrimaryActorTick.bCanEverTick = false;
 	PrimaryActorTick.bStartWithTickEnabled = false;
 
-	CellSize = 100;
+	GridSize = 100;
+	bDebug = false;
 	SizeX = 100;
 	SizeY = 100;
 }
@@ -49,9 +50,36 @@ UGridCell* AWorldGrid::CreateCell_Implementation(const FIntVector2D& Key)
 	return NewCell;
 }
 
+UGridCell* AWorldGrid::GetCellByLocationAndDirection_Implementation(
+	const FVector& Location,
+	const EGridDirection Direction,
+	const int32 Id
+)
+{
+	const auto CellLocation = GetCellLocation_Implementation(Location, Direction, Id);
+	return CreateCell_Implementation(CellLocation);
+}
+
+FVector AWorldGrid::GetCellLocation_Implementation(
+	const FVector& Location,
+	const EGridDirection Direction,
+	const int32 Id
+)
+{
+	const auto SnapLocation = SnapLocation_Implementation(Location);
+	switch (Direction)
+	{
+	case EGridDirection::North: return SnapLocation + FVector(GridSize * Id, 0, 0);
+	case EGridDirection::South: return SnapLocation + FVector(-GridSize * Id, 0, 0);
+	case EGridDirection::West: return SnapLocation + FVector(0, -GridSize * Id, 0);
+	case EGridDirection::East: return SnapLocation + FVector(0, GridSize * Id, 0);
+	default: return FVector::ZeroVector;
+	}
+}
+
 FVector AWorldGrid::SnapLocation_Implementation(const FVector& Vector)
 {
-	return UKismetMathLibrary::Vector_SnappedToGrid(Vector, CellSize);
+	return UKismetMathLibrary::Vector_SnappedToGrid(Vector, GridSize);
 }
 
 TMap<FIntVector2D, UGridCell*> AWorldGrid::GetCells_Implementation() const
@@ -61,7 +89,7 @@ TMap<FIntVector2D, UGridCell*> AWorldGrid::GetCells_Implementation() const
 
 int32 AWorldGrid::GetGridSize_Implementation()
 {
-	return CellSize;
+	return GridSize;
 }
 #pragma endregion IGrid implementation
 
@@ -79,7 +107,7 @@ void AWorldGrid::SpawnTiles(int32 X, int32 Y)
 	{
 		for (int32 CurrentX = -HalfX; CurrentX < HalfX; ++CurrentX)
 		{
-			CreateCell(FIntVector2D(CurrentX * CellSize, CurrentY * CellSize));
+			CreateCell(FIntVector2D(CurrentX * GridSize, CurrentY * GridSize));
 		}
 	}
 }
