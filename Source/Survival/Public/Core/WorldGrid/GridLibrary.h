@@ -4,7 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "GridDirectionEnum.h"
+#include "IntVector2D.h"
 #include "GridLibrary.generated.h"
+
 
 UCLASS()
 class SURVIVAL_API UGridLibrary : public UBlueprintFunctionLibrary
@@ -65,10 +67,34 @@ public:
 		Category = "GridLibrary",
 		meta = (
 			DisplayName = "ToRotation (GridDirection)",
-			AutoCreateRefTerm = "WorldDirection",
+			AutoCreateRefTerm = "Direction",
 			CompactNodeTitle = "->",
 			BlueprintAutocast
 		)
 	)
 	static FRotator GetRotationFromGridDirection(const EGridDirection Direction);
+
+	UFUNCTION(
+		BlueprintPure,
+		Category = "GridLibrary",
+		meta = (
+			DisplayName = "ToIntVector2D (Vector)",
+			AutoCreateRefTerm = "Vector",
+			CompactNodeTitle = "->",
+			BlueprintAutocast
+		)
+	)
+	static FIntVector2D VectorToIntVector2D(const FVector& Vector);
+
+	UFUNCTION(
+		BlueprintPure,
+		Category = "GridLibrary",
+		meta = (
+			DisplayName = "ToVector (IntVector2D)",
+			AutoCreateRefTerm = "Vector",
+			CompactNodeTitle = "->",
+			BlueprintAutocast
+		)
+	)
+	static FVector IntVector2DToVector(const FIntVector2D& Vector);
 };

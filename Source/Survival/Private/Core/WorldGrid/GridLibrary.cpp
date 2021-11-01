@@ -3,6 +3,7 @@
 
 #include "Core/WorldGrid/GridLibrary.h"
 
+#include "Core/WorldGrid/IntVector2D.h"
 #include "Kismet/KismetMathLibrary.h"
 
 EGridDirection UGridLibrary::GetGridDirection(const FVector& WorldDirection)
@@ -64,4 +65,14 @@ FRotator UGridLibrary::GetRotationFromGridDirection(const EGridDirection Directi
 	case EGridDirection::East: return FRotator(0.f, 90.f, 0.f);
 	default: return FRotator::ZeroRotator;
 	}
+}
+
+FIntVector2D UGridLibrary::VectorToIntVector2D(const FVector& Vector)
+{
+	return Vector;
+}
+
+FVector UGridLibrary::IntVector2DToVector(const FIntVector2D& Vector)
+{
+	return Vector;
 }
