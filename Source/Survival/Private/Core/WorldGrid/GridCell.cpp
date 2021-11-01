@@ -4,24 +4,28 @@
 #include "Core/WorldGrid/GridCell.h"
 
 
-AGridCell::AGridCell()
+UGridCell::UGridCell()
 {
-	PrimaryActorTick.bCanEverTick = true;
 }
 
-AActor* AGridCell::GetEdgeActor(EGridDirection Direction)
+AActor* UGridCell::GetEdgeActor(EGridDirection Direction)
 {
 	const auto FoundActor = EdgeActors.Find(Direction);
 	return FoundActor != nullptr ? *FoundActor : nullptr;
 }
 
-bool AGridCell::SetEdgeActor(AActor* NewActor, EGridDirection Direction)
+bool UGridCell::SetEdgeActor(AActor* NewActor, EGridDirection Direction)
 {
 	return IsValid(EdgeActors.Add(Direction, NewActor));
 }
 
-TMap<EGridDirection, AActor*> AGridCell::GetEdgeActors() const
+TMap<EGridDirection, AActor*> UGridCell::GetEdgeActors() const
 {
 	return EdgeActors;
+}
+
+int32 UGridCell::GetMeshId() const
+{
+	return MeshId;
 }
 

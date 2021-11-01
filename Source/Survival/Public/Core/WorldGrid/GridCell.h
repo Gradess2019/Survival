@@ -7,17 +7,34 @@
 #include "GameFramework/Actor.h"
 #include "GridCell.generated.h"
 
+#pragma region Forward declarations
+class AWorldGrid;
+#pragma endregion Forward declarations
+
+
 UCLASS(
 	BlueprintType,
 	Blueprintable
 )
-class SURVIVAL_API AGridCell : public AActor
+class SURVIVAL_API UGridCell : public UObject
 {
 	GENERATED_BODY()
 
 public:
-	AGridCell();
+	UGridCell();
 
+protected:
+	UPROPERTY(
+		BlueprintGetter = "GetEdgeActors"
+	)
+	TMap<EGridDirection, AActor*> EdgeActors;
+
+	UPROPERTY(
+		BlueprintGetter = "GetMeshId"
+	)
+	int32 MeshId;
+
+public:
 	UFUNCTION(
 		BlueprintPure,
 		Category = "GridCell"
@@ -37,9 +54,12 @@ public:
 	)
 	TMap<EGridDirection, AActor*> GetEdgeActors() const;
 
-protected:
-	UPROPERTY(
-		BlueprintGetter = "GetEdgeActors"
+	UFUNCTION(
+		BlueprintPure,
+		BlueprintGetter,
+		Category = "GridCell"
 	)
-	TMap<EGridDirection, AActor*> EdgeActors;
+	int32 GetMeshId() const;
+
+	friend AWorldGrid;
 };
