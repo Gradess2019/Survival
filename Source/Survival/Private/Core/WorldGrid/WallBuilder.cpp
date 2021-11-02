@@ -4,6 +4,8 @@
 #include "Core/WorldGrid/WallBuilder.h"
 
 #include "Core/WorldGrid/Grid.h"
+#include "Core/WorldGrid/GridCell.h"
+#include "Core/WorldGrid/GridLibrary.h"
 
 
 AWallBuilder::AWallBuilder()
@@ -28,8 +30,13 @@ int32 AWallBuilder::CreateWall(
 
 	const auto Id = MeshComponent->AddInstanceWorldSpace(FTransform(WallRotation, WallLocation));
 
-	IGrid::Execute_CreateCell(Grid, CellLocation);
-	IGrid::Execute_CreateCell(Grid, NextCellLocation);
+	const auto CurrentCell = IGrid::Execute_CreateCell(Grid, CellLocation);
+	const auto NextCell = IGrid::Execute_CreateCell(Grid, NextCellLocation);
+
+	const auto InversedDirection = UGridLibrary::InvertGridDirection(Direction);
+
+	CurrentCell->SetEdgeInstance(Direction, MeshComponent, Id);
+	NextCell->SetEdgeInstance(InversedDirection, MeshComponent, Id);
 	return Id;
 }
 

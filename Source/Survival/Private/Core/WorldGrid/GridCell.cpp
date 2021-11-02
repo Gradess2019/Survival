@@ -8,18 +8,22 @@ UGridCell::UGridCell()
 {
 }
 
-AActor* UGridCell::GetEdgeActor(EGridDirection Direction)
+FEdgeData UGridCell::GetEdgeActor(EGridDirection Direction)
 {
 	const auto FoundActor = EdgeActors.Find(Direction);
-	return FoundActor != nullptr ? *FoundActor : nullptr;
+	return FoundActor != nullptr ? *FoundActor : FEdgeData();
 }
 
-bool UGridCell::SetEdgeActor(AActor* NewActor, EGridDirection Direction)
+bool UGridCell::SetEdgeInstance(
+	const EGridDirection Direction,
+	const UInstancedStaticMeshComponent* Mesh,
+	const int32 InstanceId
+	)
 {
-	return IsValid(EdgeActors.Add(Direction, NewActor));
+	return EdgeActors.Add(Direction, FEdgeData(Mesh, InstanceId)).IsValid();
 }
 
-TMap<EGridDirection, AActor*> UGridCell::GetEdgeActors() const
+TMap<EGridDirection, FEdgeData> UGridCell::GetEdgeActors() const
 {
 	return EdgeActors;
 }

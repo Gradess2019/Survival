@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "EdgeData.h"
 #include "GridDirectionEnum.h"
 #include "GameFramework/Actor.h"
 #include "GridCell.generated.h"
@@ -27,7 +28,7 @@ protected:
 	UPROPERTY(
 		BlueprintGetter = "GetEdgeActors"
 	)
-	TMap<EGridDirection, AActor*> EdgeActors;
+	TMap<EGridDirection, FEdgeData> EdgeActors;
 
 	UPROPERTY(
 		BlueprintGetter = "GetMeshId"
@@ -39,20 +40,24 @@ public:
 		BlueprintPure,
 		Category = "GridCell"
 	)
-	AActor* GetEdgeActor(EGridDirection Direction);
+	FEdgeData GetEdgeActor(EGridDirection Direction);
 
 	UFUNCTION(
 		BlueprintCallable,
 		Category = "GridCell"
 	)
-	bool SetEdgeActor(AActor* NewActor, EGridDirection Direction);
+	bool SetEdgeInstance(
+		const EGridDirection Direction,
+		const UInstancedStaticMeshComponent* Mesh,
+		const int32 InstanceId
+	);
 
 	UFUNCTION(
 		BlueprintPure,
 		BlueprintGetter,
 		Category = "GridCell"
 	)
-	TMap<EGridDirection, AActor*> GetEdgeActors() const;
+	TMap<EGridDirection, FEdgeData> GetEdgeActors() const;
 
 	UFUNCTION(
 		BlueprintPure,
