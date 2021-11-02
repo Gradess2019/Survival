@@ -97,4 +97,16 @@ public:
 		)
 	)
 	static FVector IntVector2DToVector(const FIntVector2D& Vector);
+
+	UFUNCTION(
+		BlueprintPure,
+		Category = "GridLibrary",
+		meta = (
+			DisplayName = "Inverse (GridDirection)",
+			AutoCreateRefTerm = "Direction",
+			CompactNodeTitle = "INVERSE",
+			BlueprintAutocast
+		)
+	)
+	static EGridDirection InvertGridDirection(const EGridDirection Direction);
 };

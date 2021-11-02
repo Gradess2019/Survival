@@ -76,3 +76,16 @@ FVector UGridLibrary::IntVector2DToVector(const FIntVector2D& Vector)
 {
 	return Vector;
 }
+
+EGridDirection UGridLibrary::InvertGridDirection(const EGridDirection Direction)
+{
+	switch (Direction)
+	{
+	case EGridDirection::None: return EGridDirection::None;
+	case EGridDirection::North: return EGridDirection::South;
+	case EGridDirection::South: return EGridDirection::North;
+	case EGridDirection::West: return EGridDirection::East;
+	case EGridDirection::East: return EGridDirection::West;
+	default: return EGridDirection::None;
+	}
+}
