@@ -3,9 +3,12 @@
 
 #include "Core/WorldGrid.h"
 
+#include "Core/Serialization/SaveGameArchive.h"
 #include "Core/WorldGrid/GridCell.h"
 #include "Core/WorldGrid/IntVector2D.h"
+#include "Core/WorldGrid/WallBuilder.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Serialization/BufferArchive.h"
 
 DEFINE_LOG_CATEGORY(LogWorldGrid);
 #define LOG(Format, ...) UE_LOG(LogWorldGrid, Log, TEXT(Format), ##__VA_ARGS__)
@@ -21,11 +24,16 @@ AWorldGrid::AWorldGrid()
 	bDebug = false;
 	SizeX = 100;
 	SizeY = 100;
+
+	WallBuilderClass = AWallBuilder::StaticClass();
 }
 
 void AWorldGrid::BeginPlay()
 {
 	Super::BeginPlay();
+
+	WallBuilder = GetWorld()->SpawnActor<AWallBuilder>(WallBuilderClass);
+	WallBuilder->SetGrid(this);
 
 	if (bDebug)
 	{
@@ -121,4 +129,54 @@ void AWorldGrid::CreateDebugMeshForCell(const FIntVector2D& Location)
 
 	const auto Cell = *CellPtr;
 	Cell->MeshId = Id;
+}
+
+bool AWorldGrid::Save()
+{
+	TArray<uint8> Data;
+	
+	FMemoryWriter MemoryWriter(Data, true);
+	FSaveGameArchive Ar(MemoryWriter, false);
+	Ar << Cells;
+	
+	const auto Path = FString("C:\\Users\\trofi\\Downloads\\SaveTest\\test.save");
+	if (FFileHelper::SaveArrayToFile(Data, *Path)) 
+	{
+		Ar.FlushCache();
+		Ar.Close();
+		
+		return true;
+	}
+	
+	Ar.FlushCache();
+	Ar.Close();
+	
+	return false;
+}
+
+bool AWorldGrid::Load()
+{
+	TArray<uint8> Data;
+	const auto Path = FString("C:\\Users\\trofi\\Downloads\\SaveTest\\test.save");
+
+	if (!FFileHelper::LoadFileToArray(Data, *Path))
+	{
+		return false;
+	}
+	
+	FMemoryReader MemoryReader(Data, true);
+
+	FSaveGameArchive Ar(MemoryReader);
+	Ar << Cells;
+	
+	auto CellsToRebuild = Cells;
+	
+	Cells.Empty(CellsToRebuild.Num());
+	WallBuilder->LoadWalls(CellsToRebuild);
+
+	MemoryReader.FlushCache();
+	Data.Empty();
+	MemoryReader.Close();
+	
+	return true;
 }
