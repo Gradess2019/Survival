@@ -2,7 +2,6 @@
 
 
 #include "Core/WorldGrid/WallBuilder.h"
-
 #include "Core/WorldGrid/Grid.h"
 #include "Core/WorldGrid/GridCell.h"
 #include "Core/WorldGrid/GridLibrary.h"
@@ -35,9 +34,28 @@ int32 AWallBuilder::CreateWall(
 
 	const auto InversedDirection = UGridLibrary::InvertGridDirection(Direction);
 
-	CurrentCell->SetEdgeInstance(Direction, MeshComponent, Id);
-	NextCell->SetEdgeInstance(InversedDirection, MeshComponent, Id);
+	CurrentCell->SetEdgeState(Direction, true);
+	NextCell->SetEdgeState(InversedDirection, true);
 	return Id;
+}
+
+void AWallBuilder::LoadWalls(const TMap<FIntVector2D, UGridCell*>& Cells)
+{
+	for (const auto& CellPair : Cells)
+	{
+		const auto Cell = CellPair.Value;
+		const auto& CellLocation = CellPair.Key;
+
+		const auto Edges = Cell->GetEdgeStates();
+		
+		for (const auto& EdgePair : Edges)
+		{
+			// if not occupied then skip
+			if (!EdgePair.Value) { continue; }
+			
+			CreateWall(CellLocation, EdgePair.Key);
+		}
+	}
 }
 
 UObject* AWallBuilder::GetWorldGrid() const

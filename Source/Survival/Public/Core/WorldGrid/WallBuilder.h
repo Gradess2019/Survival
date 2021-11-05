@@ -3,8 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GridCell.h"
 #include "GridDirectionEnum.h"
+#include "IntVector2D.h"
 #include "GameFramework/Actor.h"
+#include "Programs/UnrealLightmass/Private/ImportExport/3DVisualizer.h"
+#include "Programs/UnrealLightmass/Private/ImportExport/3DVisualizer.h"
 #include "WallBuilder.generated.h"
 
 #pragma region Forward declarations
@@ -37,6 +41,7 @@ protected:
 	)
 	UObject* Grid;
 
+public:
 	UFUNCTION(
 		BlueprintCallable,
 		Category = "WallBuilder",
@@ -47,6 +52,14 @@ protected:
 	int32 CreateWall(
 		const FVector& Location,
 		const EGridDirection Direction
+	);
+
+	UFUNCTION(
+		BlueprintCallable,
+		Category = "WallBuilder"
+	)
+	void LoadWalls(
+		const TMap<FIntVector2D, UGridCell*>& Cells
 	);
 
 	UFUNCTION(
@@ -67,7 +80,6 @@ protected:
 	)
 	FRotator GetWallRotation(EGridDirection Direction) const;
 
-public:
 	UFUNCTION(
 		BlueprintCallable,
 		Category = "WallBuilder"
