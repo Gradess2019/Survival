@@ -3,9 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "EdgeData.h"
 #include "GridDirectionEnum.h"
-#include "GameFramework/Actor.h"
 #include "GridCell.generated.h"
 
 #pragma region Forward declarations
@@ -26,10 +24,36 @@ public:
 
 protected:
 	UPROPERTY(
-		BlueprintGetter = "GetEdgeActors"
+		SaveGame,
+		BlueprintGetter = "GetEdgeStates"
 	)
-	TMap<EGridDirection, FEdgeData> EdgeActors;
+	TMap<EGridDirection, bool> EdgeActors;
 
+public:
+	UFUNCTION(
+		BlueprintPure,
+		Category = "GridCell"
+	)
+	bool GetEdgeState(EGridDirection Direction);
+
+	UFUNCTION(
+		BlueprintCallable,
+		Category = "GridCell"
+	)
+	bool SetEdgeState(
+		const EGridDirection Direction,
+		const bool bOccupied
+	);
+
+	UFUNCTION(
+		BlueprintPure,
+		BlueprintGetter,
+		Category = "GridCell"
+	)
+	TMap<EGridDirection, bool> GetEdgeStates() const;
+
+#pragma region Debug
+protected:
 	UPROPERTY(
 		BlueprintGetter = "GetMeshId"
 	)
@@ -38,33 +62,11 @@ protected:
 public:
 	UFUNCTION(
 		BlueprintPure,
-		Category = "GridCell"
-	)
-	FEdgeData GetEdgeActor(EGridDirection Direction);
-
-	UFUNCTION(
-		BlueprintCallable,
-		Category = "GridCell"
-	)
-	bool SetEdgeInstance(
-		const EGridDirection Direction,
-		const UInstancedStaticMeshComponent* Mesh,
-		const int32 InstanceId
-	);
-
-	UFUNCTION(
-		BlueprintPure,
 		BlueprintGetter,
-		Category = "GridCell"
-	)
-	TMap<EGridDirection, FEdgeData> GetEdgeActors() const;
-
-	UFUNCTION(
-		BlueprintPure,
-		BlueprintGetter,
-		Category = "GridCell"
+		Category = "GridCell|Debug"
 	)
 	int32 GetMeshId() const;
+#pragma endregion Debug
 
 	friend AWorldGrid;
 };
