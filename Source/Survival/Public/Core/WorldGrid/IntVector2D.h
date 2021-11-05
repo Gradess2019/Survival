@@ -36,7 +36,7 @@ struct FIntVector2D
 	{
 		return FVector(X, Y, 0.f);
 	}
-	
+
 	bool operator==(const FIntVector2D& Other) const
 	{
 		return Equals(Other);
@@ -51,4 +51,12 @@ struct FIntVector2D
 FORCEINLINE uint32 GetTypeHash(const FIntVector2D& Vector)
 {
 	return FCrc::MemCrc32(&Vector, sizeof(FIntVector2D));
+}
+
+FORCEINLINE FArchive& operator<<(FArchive& Ar, FIntVector2D& Vector)
+{
+	Ar << Vector.X;
+	Ar << Vector.Y;
+
+	return Ar;
 }
