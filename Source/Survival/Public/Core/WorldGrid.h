@@ -139,6 +139,12 @@ public:
 		Category = "WorldGrid"
 	)
 	bool Load();
+
+	UFUNCTION(
+		BlueprintPure,
+		Category = "WorldGrid"
+	)
+	FString GetSaveFilePath() const;
 #pragma endregion Serialization
 
 };

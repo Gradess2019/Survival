@@ -7,6 +7,7 @@
 #include "Core/WorldGrid/GridCell.h"
 #include "Core/WorldGrid/IntVector2D.h"
 #include "Core/WorldGrid/WallBuilder.h"
+#include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Serialization/BufferArchive.h"
 
@@ -33,8 +34,6 @@ AWorldGrid::AWorldGrid()
 
 void AWorldGrid::BeginPlay()
 {
-	Super::BeginPlay();
-
 	WallBuilder = GetWorld()->SpawnActor<AWallBuilder>(WallBuilderClass);
 	WallBuilder->SetGrid(this);
 
@@ -42,6 +41,8 @@ void AWorldGrid::BeginPlay()
 	{
 		SpawnTiles(SizeX, SizeY);
 	}
+
+	Super::BeginPlay();
 }
 
 #pragma region IGrid implementation
@@ -141,9 +142,9 @@ bool AWorldGrid::Save()
 	FMemoryWriter MemoryWriter(Data, true);
 	FSaveGameArchive Ar(MemoryWriter, false);
 	Ar << Cells;
-	
-	const auto Path = FString("C:\\Users\\trofi\\Downloads\\SaveTest\\test.save");
-	if (FFileHelper::SaveArrayToFile(Data, *Path)) 
+
+	const auto SaveFilePath = GetSaveFilePath();
+	if (FFileHelper::SaveArrayToFile(Data, *SaveFilePath)) 
 	{
 		Ar.FlushCache();
 		Ar.Close();
@@ -160,9 +161,8 @@ bool AWorldGrid::Save()
 bool AWorldGrid::Load()
 {
 	TArray<uint8> Data;
-	const auto Path = FString("C:\\Users\\trofi\\Downloads\\SaveTest\\test.save");
 
-	if (!FFileHelper::LoadFileToArray(Data, *Path))
+	if (!FFileHelper::LoadFileToArray(Data, *GetSaveFilePath()))
 	{
 		return false;
 	}
@@ -182,4 +182,10 @@ bool AWorldGrid::Load()
 	MemoryReader.Close();
 	
 	return true;
+}
+
+FString AWorldGrid::GetSaveFilePath() const
+{
+	const auto LevelName = UGameplayStatics::GetCurrentLevelName(this);
+	return FPaths::ProjectSavedDir() / "MapSaves" / LevelName / LevelName + ".save";
 }
