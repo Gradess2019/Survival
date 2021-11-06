@@ -7,8 +7,6 @@
 #include "GridDirectionEnum.h"
 #include "IntVector2D.h"
 #include "GameFramework/Actor.h"
-#include "Programs/UnrealLightmass/Private/ImportExport/3DVisualizer.h"
-#include "Programs/UnrealLightmass/Private/ImportExport/3DVisualizer.h"
 #include "WallBuilder.generated.h"
 
 #pragma region Forward declarations
