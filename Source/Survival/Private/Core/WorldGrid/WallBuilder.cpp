@@ -12,6 +12,7 @@ AWallBuilder::AWallBuilder()
 	PrimaryActorTick.bCanEverTick = false;
 	PrimaryActorTick.bStartWithTickEnabled = false;
 
+	RootComponent = CreateDefaultSubobject<USceneComponent>("Root");
 	MeshComponent = CreateDefaultSubobject<UInstancedStaticMeshComponent>("InstancedStaticMesh");
 	MeshComponent->SetupAttachment(RootComponent);
 }
