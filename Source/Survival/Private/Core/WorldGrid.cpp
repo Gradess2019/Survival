@@ -10,10 +10,13 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Serialization/BufferArchive.h"
 
+#pragma region Log
 DEFINE_LOG_CATEGORY(LogWorldGrid);
+
 #define LOG(Format, ...) UE_LOG(LogWorldGrid, Log, TEXT(Format), ##__VA_ARGS__)
 #define WARN(Format, ...) UE_LOG(LogWorldGrid, Warning, TEXT(Format), ##__VA_ARGS__)
 #define ERROR(Format, ...) UE_LOG(LogWorldGrid, Error, TEXT(Format), ##__VA_ARGS__)
+#pragma endregion Log
 
 AWorldGrid::AWorldGrid()
 {
@@ -64,8 +67,8 @@ UGridCell* AWorldGrid::GetCellByLocationAndDirection_Implementation(
 	const int32 Id
 )
 {
-	const auto CellLocation = GetCellLocation_Implementation(Location, Direction, Id);
-	return CreateCell_Implementation(CellLocation);
+	const auto CellLocation = Execute_GetCellLocation(this, Location, Direction, Id);
+	return Execute_CreateCell(this, CellLocation);
 }
 
 FVector AWorldGrid::GetCellLocation_Implementation(
@@ -74,7 +77,7 @@ FVector AWorldGrid::GetCellLocation_Implementation(
 	const int32 Id
 )
 {
-	const auto SnapLocation = SnapLocation_Implementation(Location);
+	const auto SnapLocation = Execute_SnapLocation(this, Location);
 	switch (Direction)
 	{
 	case EGridDirection::North: return SnapLocation + FVector(GridSize * Id, 0, 0);
@@ -115,7 +118,7 @@ void AWorldGrid::SpawnTiles(int32 X, int32 Y)
 	{
 		for (int32 CurrentX = -HalfX; CurrentX < HalfX; ++CurrentX)
 		{
-			CreateCell(FIntVector2D(CurrentX * GridSize, CurrentY * GridSize));
+			Execute_CreateCell(this, FIntVector2D(CurrentX * GridSize, CurrentY * GridSize));
 		}
 	}
 }

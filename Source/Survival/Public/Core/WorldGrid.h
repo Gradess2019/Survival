@@ -8,16 +8,22 @@
 #include "WorldGrid/IntVector2D.h"
 #include "WorldGrid.generated.h"
 
+#pragma region Log
 DECLARE_LOG_CATEGORY_EXTERN(LogWorldGrid, Log, All);
+#pragma endregion Log
 
 #pragma region Forward declarations
 class UGridCell;
 class AWallBuilder;
 #pragma endregion Forward declarations
 
+/**
+ * @brief Actor that manages creation, deletion, saving, loading grid cells
+ */
 UCLASS(
 	Blueprintable,
-	BlueprintType
+	BlueprintType,
+	ClassGroup=Survival
 )
 class SURVIVAL_API AWorldGrid : public AActor, public IGrid
 {
@@ -27,7 +33,41 @@ public:
 	AWorldGrid();
 
 protected:
-#pragma region Debug Properties
+	/**
+	 * @brief Size of 1 cell in unreal units. Size x Size
+	 */
+	UPROPERTY(
+		EditAnywhere,
+		BlueprintReadOnly,
+		SaveGame,
+		Category = "WorldGrid"
+	)
+	int32 GridSize;
+
+	UPROPERTY(
+		EditAnywhere,
+		BlueprintReadOnly,
+		SaveGame,
+		Category = "WorldGrid"
+	)
+	TSubclassOf<AWallBuilder> WallBuilderClass;
+
+	UPROPERTY(
+		BlueprintReadOnly,
+		Category = "WorldGrid"
+	)
+	AWallBuilder* WallBuilder;
+
+	/**
+	 * @brief Map of created cells 
+	 */
+	UPROPERTY(
+		BlueprintReadOnly,
+		Category = "WorldGrid"
+	)
+	TMap<FIntVector2D, UGridCell*> Cells;
+
+#pragma region Debug
 	UPROPERTY(
 		EditAnywhere,
 		BlueprintReadOnly,
@@ -51,47 +91,32 @@ protected:
 
 	UPROPERTY()
 	UInstancedStaticMeshComponent* InstancedStaticMeshComponent;
-#pragma endregion Debug Properties
-
-	UPROPERTY(
-		EditAnywhere,
-		BlueprintReadOnly,
-		SaveGame,
-		Category = "WorldGrid"
-	)
-	int32 GridSize;
-
-	UPROPERTY(
-		EditAnywhere,
-		BlueprintReadOnly,
-		SaveGame,
-		Category = "WorldGrid"
-	)
-	TSubclassOf<AWallBuilder> WallBuilderClass;
-
-	UPROPERTY()
-	AWallBuilder* WallBuilder;
-
-	UPROPERTY(
-		BlueprintReadOnly,
-		Category = "WorldGrid|Debug"
-	)
-	TMap<FIntVector2D, UGridCell*> Cells;
+#pragma endregion Debug
 
 public:
 	virtual void BeginPlay() override;
 
 #pragma region IGrid implementation
 	virtual UGridCell* CreateCell_Implementation(const FIntVector2D& Key) override;
-	virtual UGridCell* GetCellByLocationAndDirection_Implementation(const FVector& Location, EGridDirection Direction,
-	                                                                const int32 Id) override;
-	virtual FVector
-	GetCellLocation_Implementation(const FVector& Location, EGridDirection Direction, const int32 Id) override;
+
+	virtual UGridCell* GetCellByLocationAndDirection_Implementation(
+		const FVector& Location,
+		EGridDirection Direction,
+		const int32 Id
+	) override;
+
+	virtual FVector GetCellLocation_Implementation(
+		const FVector& Location,
+		EGridDirection Direction,
+		const int32 Id
+	) override;
+
 	virtual FVector SnapLocation_Implementation(const FVector& Vector) override;
 	virtual TMap<FIntVector2D, UGridCell*> GetCells_Implementation() const override;
 	virtual int32 GetGridSize_Implementation() override;
 #pragma endregion IGrid implementation
 
+#pragma region Debug
 	UFUNCTION()
 	void SpawnTiles(int32 X, int32 Y);
 
@@ -100,10 +125,20 @@ public:
 		Category = "WorldGrid|Debug"
 	)
 	void CreateDebugMeshForCell(const FIntVector2D& Location);
+#pragma endregion Debug
 
-	UFUNCTION(BlueprintCallable)
+#pragma region Serialization
+	UFUNCTION(
+		BlueprintCallable,
+		Category = "WorldGrid"
+	)
 	bool Save();
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(
+		BlueprintCallable,
+		Category = "WorldGrid"
+	)
 	bool Load();
+#pragma endregion Serialization
+
 };
