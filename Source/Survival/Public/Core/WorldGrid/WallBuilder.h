@@ -16,6 +16,9 @@ class IGrid;
 #pragma endregion Forward declarations
 
 
+/**
+ * @brief Simple wall builder
+ */
 UCLASS(
 	BlueprintType,
 	Blueprintable
