@@ -7,13 +7,17 @@
 #include "Core/WorldGrid/GridCell.h"
 #include "Core/WorldGrid/IntVector2D.h"
 #include "Core/WorldGrid/WallBuilder.h"
+#include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Serialization/BufferArchive.h"
 
+#pragma region Log
 DEFINE_LOG_CATEGORY(LogWorldGrid);
+
 #define LOG(Format, ...) UE_LOG(LogWorldGrid, Log, TEXT(Format), ##__VA_ARGS__)
 #define WARN(Format, ...) UE_LOG(LogWorldGrid, Warning, TEXT(Format), ##__VA_ARGS__)
 #define ERROR(Format, ...) UE_LOG(LogWorldGrid, Error, TEXT(Format), ##__VA_ARGS__)
+#pragma endregion Log
 
 AWorldGrid::AWorldGrid()
 {
@@ -30,8 +34,6 @@ AWorldGrid::AWorldGrid()
 
 void AWorldGrid::BeginPlay()
 {
-	Super::BeginPlay();
-
 	WallBuilder = GetWorld()->SpawnActor<AWallBuilder>(WallBuilderClass);
 	WallBuilder->SetGrid(this);
 
@@ -39,6 +41,8 @@ void AWorldGrid::BeginPlay()
 	{
 		SpawnTiles(SizeX, SizeY);
 	}
+
+	Super::BeginPlay();
 }
 
 #pragma region IGrid implementation
@@ -64,8 +68,8 @@ UGridCell* AWorldGrid::GetCellByLocationAndDirection_Implementation(
 	const int32 Id
 )
 {
-	const auto CellLocation = GetCellLocation_Implementation(Location, Direction, Id);
-	return CreateCell_Implementation(CellLocation);
+	const auto CellLocation = Execute_GetCellLocation(this, Location, Direction, Id);
+	return Execute_CreateCell(this, CellLocation);
 }
 
 FVector AWorldGrid::GetCellLocation_Implementation(
@@ -74,7 +78,7 @@ FVector AWorldGrid::GetCellLocation_Implementation(
 	const int32 Id
 )
 {
-	const auto SnapLocation = SnapLocation_Implementation(Location);
+	const auto SnapLocation = Execute_SnapLocation(this, Location);
 	switch (Direction)
 	{
 	case EGridDirection::North: return SnapLocation + FVector(GridSize * Id, 0, 0);
@@ -115,7 +119,7 @@ void AWorldGrid::SpawnTiles(int32 X, int32 Y)
 	{
 		for (int32 CurrentX = -HalfX; CurrentX < HalfX; ++CurrentX)
 		{
-			CreateCell(FIntVector2D(CurrentX * GridSize, CurrentY * GridSize));
+			Execute_CreateCell(this, FIntVector2D(CurrentX * GridSize, CurrentY * GridSize));
 		}
 	}
 }
@@ -131,6 +135,22 @@ void AWorldGrid::CreateDebugMeshForCell(const FIntVector2D& Location)
 	Cell->MeshId = Id;
 }
 
+void AWorldGrid::RebuildGridMeshes()
+{
+	WallBuilder->RemoveWalls();
+	InstancedStaticMeshComponent->ClearInstances();
+
+	WallBuilder->LoadWalls(Cells);
+
+	if (bDebug)
+	{
+		for (const auto& Cell : Cells)
+		{
+			CreateDebugMeshForCell(Cell.Key);
+		}
+	}
+}
+
 bool AWorldGrid::Save()
 {
 	TArray<uint8> Data;
@@ -138,9 +158,9 @@ bool AWorldGrid::Save()
 	FMemoryWriter MemoryWriter(Data, true);
 	FSaveGameArchive Ar(MemoryWriter, false);
 	Ar << Cells;
-	
-	const auto Path = FString("C:\\Users\\trofi\\Downloads\\SaveTest\\test.save");
-	if (FFileHelper::SaveArrayToFile(Data, *Path)) 
+
+	const auto SaveFilePath = GetSaveFilePath();
+	if (FFileHelper::SaveArrayToFile(Data, *SaveFilePath)) 
 	{
 		Ar.FlushCache();
 		Ar.Close();
@@ -157,26 +177,27 @@ bool AWorldGrid::Save()
 bool AWorldGrid::Load()
 {
 	TArray<uint8> Data;
-	const auto Path = FString("C:\\Users\\trofi\\Downloads\\SaveTest\\test.save");
 
-	if (!FFileHelper::LoadFileToArray(Data, *Path))
+	if (!FFileHelper::LoadFileToArray(Data, *GetSaveFilePath()))
 	{
 		return false;
 	}
-	
 	FMemoryReader MemoryReader(Data, true);
 
 	FSaveGameArchive Ar(MemoryReader);
 	Ar << Cells;
 	
-	auto CellsToRebuild = Cells;
-	
-	Cells.Empty(CellsToRebuild.Num());
-	WallBuilder->LoadWalls(CellsToRebuild);
+	RebuildGridMeshes();
 
 	MemoryReader.FlushCache();
 	Data.Empty();
 	MemoryReader.Close();
 	
 	return true;
+}
+
+FString AWorldGrid::GetSaveFilePath() const
+{
+	const auto LevelName = UGameplayStatics::GetCurrentLevelName(this);
+	return FPaths::ProjectSavedDir() / "MapSaves" / LevelName / LevelName + ".save";
 }

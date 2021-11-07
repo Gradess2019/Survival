@@ -10,7 +10,7 @@ UGridCell::UGridCell()
 
 bool UGridCell::GetEdgeState(EGridDirection Direction)
 {
-	const auto FoundActor = EdgeActors.Find(Direction);
+	const auto FoundActor = EdgeStates.Find(Direction);
 	return FoundActor != nullptr ? *FoundActor : false;
 }
 
@@ -19,12 +19,12 @@ bool UGridCell::SetEdgeState(
 	const bool bOccupied
 )
 {
-	return EdgeActors.Add(Direction, bOccupied);
+	return EdgeStates.Add(Direction, bOccupied);
 }
 
 TMap<EGridDirection, bool> UGridCell::GetEdgeStates() const
 {
-	return EdgeActors;
+	return EdgeStates;
 }
 
 int32 UGridCell::GetMeshId() const

@@ -7,8 +7,6 @@
 #include "GridDirectionEnum.h"
 #include "IntVector2D.h"
 #include "GameFramework/Actor.h"
-#include "Programs/UnrealLightmass/Private/ImportExport/3DVisualizer.h"
-#include "Programs/UnrealLightmass/Private/ImportExport/3DVisualizer.h"
 #include "WallBuilder.generated.h"
 
 #pragma region Forward declarations
@@ -16,6 +14,9 @@ class IGrid;
 #pragma endregion Forward declarations
 
 
+/**
+ * @brief Simple wall builder
+ */
 UCLASS(
 	BlueprintType,
 	Blueprintable
@@ -63,6 +64,18 @@ public:
 	);
 
 	UFUNCTION(
+		BlueprintCallable,
+		Category = "WallBuilder"
+	)
+	bool RemoveWall(const int32 Id);
+
+	UFUNCTION(
+		BlueprintCallable,
+		Category = "WallBuilder"
+	)
+	void RemoveWalls();
+
+	UFUNCTION(
 		BlueprintPure,
 		Category = "WallBuilder"
 	)
@@ -85,4 +98,11 @@ public:
 		Category = "WallBuilder"
 	)
 	void SetGrid(UObject* NewGrid);
+
+protected:
+	UFUNCTION()
+	int32 CreateMesh(
+		EGridDirection Direction,
+		FVector CellLocation
+	);
 };
