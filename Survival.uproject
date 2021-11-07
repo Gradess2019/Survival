@@ -33,5 +33,9 @@
 			"Name": "GradessLibrary",
 			"Enabled": true
 		}
+	],
+	"TargetPlatforms": [
+		"WindowsNoEditor",
+		"WindowsNoEditorWin32"
 	]
 }
