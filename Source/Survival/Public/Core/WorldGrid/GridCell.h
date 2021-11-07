@@ -27,7 +27,7 @@ protected:
 		SaveGame,
 		BlueprintGetter = "GetEdgeStates"
 	)
-	TMap<EGridDirection, bool> EdgeActors;
+	TMap<EGridDirection, bool> EdgeStates;
 
 public:
 	UFUNCTION(

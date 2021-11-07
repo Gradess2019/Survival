@@ -25,10 +25,7 @@ int32 AWallBuilder::CreateWall(
 	const auto CellLocation = IGrid::Execute_SnapLocation(Grid, Location);
 	const auto NextCellLocation = IGrid::Execute_GetCellLocation(Grid, Location, Direction, 1);
 
-	const auto WallLocation = CellLocation + GetWallOffset(Direction);
-	const auto WallRotation = GetWallRotation(Direction);
-
-	const auto Id = MeshComponent->AddInstanceWorldSpace(FTransform(WallRotation, WallLocation));
+	const auto Id = CreateMesh(Direction, CellLocation);
 
 	const auto CurrentCell = IGrid::Execute_CreateCell(Grid, CellLocation);
 	const auto NextCell = IGrid::Execute_CreateCell(Grid, NextCellLocation);
@@ -38,6 +35,17 @@ int32 AWallBuilder::CreateWall(
 	CurrentCell->SetEdgeState(Direction, true);
 	NextCell->SetEdgeState(InversedDirection, true);
 	return Id;
+}
+
+int32 AWallBuilder::CreateMesh(
+	const EGridDirection Direction,
+	const FVector CellLocation
+)
+{
+	const auto WallLocation = CellLocation + GetWallOffset(Direction);
+	const auto WallRotation = GetWallRotation(Direction);
+
+	return MeshComponent->AddInstanceWorldSpace(FTransform(WallRotation, WallLocation));
 }
 
 void AWallBuilder::LoadWalls(const TMap<FIntVector2D, UGridCell*>& Cells)
@@ -57,6 +65,16 @@ void AWallBuilder::LoadWalls(const TMap<FIntVector2D, UGridCell*>& Cells)
 			CreateWall(CellLocation, EdgePair.Key);
 		}
 	}
+}
+
+bool AWallBuilder::RemoveWall(const int32 Id)
+{
+	return MeshComponent->RemoveInstance(Id);
+}
+
+void AWallBuilder::RemoveWalls()
+{
+	MeshComponent->ClearInstances();
 }
 
 UObject* AWallBuilder::GetWorldGrid() const

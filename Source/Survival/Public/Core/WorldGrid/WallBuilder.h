@@ -64,6 +64,18 @@ public:
 	);
 
 	UFUNCTION(
+		BlueprintCallable,
+		Category = "WallBuilder"
+	)
+	bool RemoveWall(const int32 Id);
+
+	UFUNCTION(
+		BlueprintCallable,
+		Category = "WallBuilder"
+	)
+	void RemoveWalls();
+
+	UFUNCTION(
 		BlueprintPure,
 		Category = "WallBuilder"
 	)
@@ -86,4 +98,11 @@ public:
 		Category = "WallBuilder"
 	)
 	void SetGrid(UObject* NewGrid);
+
+protected:
+	UFUNCTION()
+	int32 CreateMesh(
+		EGridDirection Direction,
+		FVector CellLocation
+	);
 };

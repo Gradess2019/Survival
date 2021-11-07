@@ -135,6 +135,22 @@ void AWorldGrid::CreateDebugMeshForCell(const FIntVector2D& Location)
 	Cell->MeshId = Id;
 }
 
+void AWorldGrid::RebuildGridMeshes()
+{
+	WallBuilder->RemoveWalls();
+	InstancedStaticMeshComponent->ClearInstances();
+
+	WallBuilder->LoadWalls(Cells);
+
+	if (bDebug)
+	{
+		for (const auto& Cell : Cells)
+		{
+			CreateDebugMeshForCell(Cell.Key);
+		}
+	}
+}
+
 bool AWorldGrid::Save()
 {
 	TArray<uint8> Data;
@@ -166,16 +182,12 @@ bool AWorldGrid::Load()
 	{
 		return false;
 	}
-	
 	FMemoryReader MemoryReader(Data, true);
 
 	FSaveGameArchive Ar(MemoryReader);
 	Ar << Cells;
 	
-	auto CellsToRebuild = Cells;
-	
-	Cells.Empty(CellsToRebuild.Num());
-	WallBuilder->LoadWalls(CellsToRebuild);
+	RebuildGridMeshes();
 
 	MemoryReader.FlushCache();
 	Data.Empty();

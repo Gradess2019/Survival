@@ -125,6 +125,12 @@ public:
 		Category = "WorldGrid|Debug"
 	)
 	void CreateDebugMeshForCell(const FIntVector2D& Location);
+
+	UFUNCTION(
+		BlueprintCallable,
+		Category = "WorldGrid|Debug"
+	)
+	void RebuildGridMeshes();
 #pragma endregion Debug
 
 #pragma region Serialization
