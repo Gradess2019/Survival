@@ -3,17 +3,17 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Enums.generated.h"
+#include "MovementState.generated.h"
 
 UENUM(
 	BlueprintType,
-	meta = (
-		BitFlags
-	)
+	Blueprintable
 )
 enum class EMovementState : uint8
 {
 	Idle,
+	Crouch,
 	Walk,
-	Run
+	Run,
+	Sprint
 };
