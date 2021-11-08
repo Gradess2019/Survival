@@ -31,7 +31,13 @@
 		},
 		{
 			"Name": "GradessLibrary",
-			"Enabled": true
+			"Enabled": true,
+			"MarketplaceURL": "https://github.com/Gradess2019/GradessLibrary"
+		},
+		{
+			"Name": "ALSV4_CPP",
+			"Enabled": true,
+			"MarketplaceURL": "https://github.com/dyanikoglu/ALS-Community/tree/main"
 		}
 	],
 	"TargetPlatforms": [

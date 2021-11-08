@@ -712,3 +712,4 @@ FodyWeavers.xsd
 Plugins/GradessLibrary
 
 # End of https://www.toptal.com/developers/gitignore/api/visualstudio,visualstudiocode,intellij,clion,rider,unrealengine
+/Plugins/ALSV4_CPP/
