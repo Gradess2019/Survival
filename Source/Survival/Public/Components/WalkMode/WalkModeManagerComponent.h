@@ -3,12 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "Components/ActorComponent.h"
 #include "WalkModeManagerComponent.generated.h"
 
 
 #pragma region Forward declarations
-struct FGameplayTag;
 class ASurvivalCharacter;
 enum class ESurvivalMovementMode : uint8;
 #pragma endregion Forward declarations
