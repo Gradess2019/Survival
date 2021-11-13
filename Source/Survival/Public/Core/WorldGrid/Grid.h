@@ -8,9 +8,11 @@
 #include "UObject/Interface.h"
 #include "Grid.generated.h"
 
+
 #pragma region Forward declarations
 class UGridCell;
 #pragma endregion Forward declarations
+
 
 UINTERFACE()
 class UGrid : public UInterface

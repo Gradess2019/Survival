@@ -8,7 +8,8 @@
 
 UCLASS(
 	Blueprintable,
-	BlueprintType
+	BlueprintType,
+	ClassGroup = Survival
 )
 class SURVIVAL_API UPlayerAttributeSet : public UGLibBaseAttributeSet
 {

@@ -16,7 +16,7 @@ UWalkModeManagerComponent::UWalkModeManagerComponent()
 	bWantsInitializeComponent = true;
 	
 	DefaultMovementMode = ESurvivalMovementMode::Walk;
-	PreviousMovementMode = ESurvivalMovementMode::Idle;
+	PreviousDefaultMovementMode = ESurvivalMovementMode::Idle;
 	CurrentMovementMode = ESurvivalMovementMode::Idle;
 
 	MovementTag = {
@@ -63,15 +63,15 @@ void UWalkModeManagerComponent::ToggleCrouch()
 	case ESurvivalMovementMode::Sprint: return;
 	case ESurvivalMovementMode::Crouch:
 		{
-			DefaultMovementMode = PreviousMovementMode;
-			PreviousMovementMode = ESurvivalMovementMode::Crouch;
+			DefaultMovementMode = PreviousDefaultMovementMode;
+			PreviousDefaultMovementMode = ESurvivalMovementMode::Crouch;
 			break;
 		}
 	case ESurvivalMovementMode::Idle:
 	case ESurvivalMovementMode::Walk:
 	case ESurvivalMovementMode::Run:
 		{
-			PreviousMovementMode = DefaultMovementMode;
+			PreviousDefaultMovementMode = DefaultMovementMode;
 			DefaultMovementMode = ESurvivalMovementMode::Crouch;
 			break;
 		}
@@ -87,8 +87,8 @@ void UWalkModeManagerComponent::ToggleSprint()
 	{
 	case ESurvivalMovementMode::Sprint:
 		{
-			DefaultMovementMode = PreviousMovementMode;
-			PreviousMovementMode = ESurvivalMovementMode::Walk;
+			DefaultMovementMode = PreviousDefaultMovementMode;
+			PreviousDefaultMovementMode = ESurvivalMovementMode::Walk;
 			break;
 		}
 	case ESurvivalMovementMode::Idle:
@@ -96,7 +96,7 @@ void UWalkModeManagerComponent::ToggleSprint()
 	case ESurvivalMovementMode::Walk:
 	case ESurvivalMovementMode::Run:
 		{
-			PreviousMovementMode = DefaultMovementMode;
+			PreviousDefaultMovementMode = DefaultMovementMode;
 			DefaultMovementMode = ESurvivalMovementMode::Sprint;
 			break;
 		}
@@ -113,7 +113,7 @@ ESurvivalMovementMode UWalkModeManagerComponent::GetDefaultMovementMode() const
 
 ESurvivalMovementMode UWalkModeManagerComponent::GetPreviousDefaultMovementMode() const
 {
-	return PreviousMovementMode;
+	return PreviousDefaultMovementMode;
 }
 
 ESurvivalMovementMode UWalkModeManagerComponent::GetCurrentMovementMode() const

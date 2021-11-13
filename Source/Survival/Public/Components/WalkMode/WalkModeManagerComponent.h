@@ -14,7 +14,14 @@ class ASurvivalCharacter;
 #pragma endregion Forward declarations
 
 
-UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
+UCLASS(
+	Blueprintable,
+	BlueprintType,
+	ClassGroup = Survival,
+	meta = (
+		BlueprintSpawnableComponent
+	)
+)
 class SURVIVAL_API UWalkModeManagerComponent : public UActorComponent
 {
 	GENERATED_BODY()
@@ -92,7 +99,7 @@ private:
 		BlueprintGetter = "GetPreviousDefaultMovementMode",
 		Category = "WalMode"
 	)
-	ESurvivalMovementMode PreviousMovementMode;
+	ESurvivalMovementMode PreviousDefaultMovementMode;
 
 	UPROPERTY(
 		BlueprintSetter = "SetCurrentMovementMode",
@@ -101,12 +108,12 @@ private:
 	)
 	ESurvivalMovementMode CurrentMovementMode;
 
-	UPROPERTY()
-	ASurvivalCharacter* Character;
-
 	UPROPERTY(
 		EditAnywhere,
 		Category = "WalkMode"
 	)
 	TMap<ESurvivalMovementMode, FGameplayTag> MovementTag;
+
+	UPROPERTY()
+	ASurvivalCharacter* Character;
 };

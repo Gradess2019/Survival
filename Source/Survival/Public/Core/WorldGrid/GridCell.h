@@ -6,6 +6,7 @@
 #include "GridDirectionEnum.h"
 #include "GridCell.generated.h"
 
+
 #pragma region Forward declarations
 class AWorldGrid;
 #pragma endregion Forward declarations
@@ -13,7 +14,8 @@ class AWorldGrid;
 
 UCLASS(
 	BlueprintType,
-	Blueprintable
+	Blueprintable,
+	ClassGroup = Survival
 )
 class SURVIVAL_API UGridCell : public UObject
 {
