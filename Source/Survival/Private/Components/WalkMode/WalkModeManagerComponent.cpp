@@ -88,7 +88,7 @@ void UWalkModeManagerComponent::ToggleSprint()
 	case ESurvivalMovementMode::Sprint:
 		{
 			DefaultMovementMode = PreviousMovementMode;
-			PreviousMovementMode = ESurvivalMovementMode::Run;
+			PreviousMovementMode = ESurvivalMovementMode::Walk;
 			break;
 		}
 	case ESurvivalMovementMode::Idle:
