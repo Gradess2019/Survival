@@ -120,6 +120,7 @@ ESurvivalMovementMode UWalkModeManagerComponent::GetCurrentMovementMode() const
 
 UWalkModeManagerComponent* UWalkModeManagerComponent::GetWalkModeManager(const AActor* Actor)
 {
+	if (!IsValid(Actor)) { return nullptr; }
 	return Actor->FindComponentByClass<UWalkModeManagerComponent>();
 }
 
