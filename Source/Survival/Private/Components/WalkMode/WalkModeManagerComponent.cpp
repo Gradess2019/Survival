@@ -123,7 +123,7 @@ UWalkModeManagerComponent* UWalkModeManagerComponent::GetWalkModeManager(const A
 	return Actor->FindComponentByClass<UWalkModeManagerComponent>();
 }
 
-void UWalkModeManagerComponent::SetMovementMode(ESurvivalMovementMode NewMode)
+void UWalkModeManagerComponent::SetCurrentMovementMode(ESurvivalMovementMode NewMode)
 {
 	CurrentMovementMode = NewMode;
 	UpdateMovementMode();
@@ -133,7 +133,7 @@ void UWalkModeManagerComponent::SetMovementModeToDefaultIfMoving()
 {
 	if (CurrentMovementMode == ESurvivalMovementMode::Idle) { return; }
 
-	SetMovementMode(DefaultMovementMode);
+	SetCurrentMovementMode(DefaultMovementMode);
 }
 
 void UWalkModeManagerComponent::UpdateMovementMode()
@@ -146,5 +146,5 @@ void UWalkModeManagerComponent::OnPressMoveAction(FKey Key)
 {
 	if (CurrentMovementMode != ESurvivalMovementMode::Idle) { return; }
 
-	SetMovementMode(DefaultMovementMode);
+	SetCurrentMovementMode(DefaultMovementMode);
 }

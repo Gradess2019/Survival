@@ -42,6 +42,12 @@ public:
 	void ToggleSprint();
 
 	UFUNCTION(
+		BlueprintSetter,
+		Category = "WalkMode"
+	)
+	void SetCurrentMovementMode(ESurvivalMovementMode NewMode);
+
+	UFUNCTION(
 		BlueprintGetter,
 		Category = "WalMode"
 	)
@@ -57,12 +63,9 @@ public:
 		BlueprintPure,
 		Category = "WalkMode"
 	)
-	static UWalkModeManagerComponent*  GetWalkModeManager(const AActor* Actor);
+	static UWalkModeManagerComponent* GetWalkModeManager(const AActor* Actor);
 
 protected:
-	UFUNCTION()
-	void SetMovementMode(ESurvivalMovementMode NewMode);
-
 	UFUNCTION()
 	void SetMovementModeToDefaultIfMoving();
 
@@ -74,7 +77,7 @@ protected:
 
 private:
 	UPROPERTY(
-		BlueprintGetter = GetDefaultMovementMode,
+		BlueprintGetter = "GetDefaultMovementMode",
 		Category = "WalMode"
 	)
 	ESurvivalMovementMode DefaultMovementMode;
@@ -83,7 +86,8 @@ private:
 	ESurvivalMovementMode PreviousMovementMode;
 
 	UPROPERTY(
-		BlueprintGetter = GetCurrentMovementMode,
+		BlueprintSetter = "SetCurrentMovementMode",
+		BlueprintGetter = "GetCurrentMovementMode",
 		Category = "WalMode"
 	)
 	ESurvivalMovementMode CurrentMovementMode;
@@ -91,6 +95,9 @@ private:
 	UPROPERTY()
 	ASurvivalCharacter* Character;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(
+		EditAnywhere,
+		Category = "WalkMode"
+	)
 	TMap<ESurvivalMovementMode, FGameplayTag> MovementTag;
 };
