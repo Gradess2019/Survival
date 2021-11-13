@@ -111,6 +111,11 @@ ESurvivalMovementMode UWalkModeManagerComponent::GetDefaultMovementMode() const
 	return DefaultMovementMode;
 }
 
+ESurvivalMovementMode UWalkModeManagerComponent::GetPreviousDefaultMovementMode() const
+{
+	return PreviousMovementMode;
+}
+
 ESurvivalMovementMode UWalkModeManagerComponent::GetCurrentMovementMode() const
 {
 	return CurrentMovementMode;

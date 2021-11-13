@@ -57,6 +57,12 @@ public:
 		BlueprintGetter,
 		Category = "WalMode"
 	)
+	ESurvivalMovementMode GetPreviousDefaultMovementMode() const;
+
+	UFUNCTION(
+		BlueprintGetter,
+		Category = "WalMode"
+	)
 	ESurvivalMovementMode GetCurrentMovementMode() const;
 
 	UFUNCTION(
@@ -82,7 +88,10 @@ private:
 	)
 	ESurvivalMovementMode DefaultMovementMode;
 
-	UPROPERTY()
+	UPROPERTY(
+		BlueprintGetter = "GetPreviousDefaultMovementMode",
+		Category = "WalMode"
+	)
 	ESurvivalMovementMode PreviousMovementMode;
 
 	UPROPERTY(
