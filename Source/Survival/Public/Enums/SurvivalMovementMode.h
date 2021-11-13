@@ -3,13 +3,16 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "MovementState.generated.h"
+#include "SurvivalMovementMode.generated.h"
 
 UENUM(
 	BlueprintType,
-	Blueprintable
+	Blueprintable,
+	meta = (
+		DisplayName = "EMovementMode"
+	)
 )
-enum class EMovementState : uint8
+enum class ESurvivalMovementMode : uint8
 {
 	Idle,
 	Crouch,
