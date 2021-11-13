@@ -1,18 +1,20 @@
 ﻿// Copyright Gradess. All Rights Reserved.
 
 
-#include "Components/WalkMode/WalkModeManager.h"
+#include "Components/WalkMode/WalkModeManagerComponent.h"
 
 #include "AbilitySystem/Tags.h"
 #include "Characters/SurvivalCharacter.h"
 #include "Enums/SurvivalMovementMode.h"
 
 
-UWalkModeManager::UWalkModeManager()
+UWalkModeManagerComponent::UWalkModeManagerComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
 	PrimaryComponentTick.bStartWithTickEnabled = false;
 
+	bWantsInitializeComponent = true;
+	
 	DefaultMovementMode = ESurvivalMovementMode::Walk;
 	PreviousMovementMode = ESurvivalMovementMode::Idle;
 	CurrentMovementMode = ESurvivalMovementMode::Idle;
@@ -26,17 +28,17 @@ UWalkModeManager::UWalkModeManager()
 	};
 }
 
-void UWalkModeManager::InitializeComponent()
+void UWalkModeManagerComponent::InitializeComponent()
 {
 	Super::InitializeComponent();
 
 	Character = GetOwner<ASurvivalCharacter>();
 	check(Character);
 
-	Character->OnPressMoveKey.AddDynamic(this, &UWalkModeManager::OnPressMoveAction);
+	Character->OnPressMoveKey.AddDynamic(this, &UWalkModeManagerComponent::OnPressMoveAction);
 }
 
-void UWalkModeManager::ToggleWalkMode()
+void UWalkModeManagerComponent::ToggleWalkMode()
 {
 	switch (DefaultMovementMode)
 	{
@@ -56,7 +58,7 @@ void UWalkModeManager::ToggleWalkMode()
 	SetMovementModeToDefaultIfMoving();
 }
 
-void UWalkModeManager::ToggleCrouch()
+void UWalkModeManagerComponent::ToggleCrouch()
 {
 	switch (DefaultMovementMode)
 	{
@@ -81,7 +83,7 @@ void UWalkModeManager::ToggleCrouch()
 	SetMovementModeToDefaultIfMoving();
 }
 
-void UWalkModeManager::ToggleSprint()
+void UWalkModeManagerComponent::ToggleSprint()
 {
 	switch (DefaultMovementMode)
 	{
@@ -106,36 +108,36 @@ void UWalkModeManager::ToggleSprint()
 	SetMovementModeToDefaultIfMoving();
 }
 
-ESurvivalMovementMode UWalkModeManager::GetDefaultMovementMode() const
+ESurvivalMovementMode UWalkModeManagerComponent::GetDefaultMovementMode() const
 {
 	return DefaultMovementMode;
 }
 
-ESurvivalMovementMode UWalkModeManager::GetCurrentMovementMode() const
+ESurvivalMovementMode UWalkModeManagerComponent::GetCurrentMovementMode() const
 {
 	return CurrentMovementMode;
 }
 
-void UWalkModeManager::SetMovementMode(ESurvivalMovementMode NewMode)
+void UWalkModeManagerComponent::SetMovementMode(ESurvivalMovementMode NewMode)
 {
 	CurrentMovementMode = NewMode;
 	UpdateMovementMode();
 }
 
-void UWalkModeManager::SetMovementModeToDefaultIfMoving()
+void UWalkModeManagerComponent::SetMovementModeToDefaultIfMoving()
 {
 	if (CurrentMovementMode == ESurvivalMovementMode::Idle) { return; }
 
 	SetMovementMode(DefaultMovementMode);
 }
 
-void UWalkModeManager::UpdateMovementMode()
+void UWalkModeManagerComponent::UpdateMovementMode()
 {
 	const auto& Tag = MovementTag[CurrentMovementMode];
 	Character->ActivateAbility(FGameplayTagContainer(Tag));
 }
 
-void UWalkModeManager::OnPressMoveAction(FKey Key)
+void UWalkModeManagerComponent::OnPressMoveAction(FKey Key)
 {
 	if (CurrentMovementMode != ESurvivalMovementMode::Idle) { return; }
 

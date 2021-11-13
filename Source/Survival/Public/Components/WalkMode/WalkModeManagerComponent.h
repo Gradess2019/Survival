@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "WalkModeManager.generated.h"
+#include "WalkModeManagerComponent.generated.h"
 
 
 #pragma region Forward declarations
@@ -15,12 +15,12 @@ enum class ESurvivalMovementMode : uint8;
 
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
-class SURVIVAL_API UWalkModeManager : public UActorComponent
+class SURVIVAL_API UWalkModeManagerComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
 public:
-	UWalkModeManager();
+	UWalkModeManagerComponent();
 	virtual void InitializeComponent() override;
 
 	UFUNCTION(
