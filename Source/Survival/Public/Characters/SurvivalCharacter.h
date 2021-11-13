@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Characters/GLibGASCharacter.h"
+#include "Enums/MovementState.h"
 #include "GameFramework/Character.h"
 #include "SurvivalCharacter.generated.h"
 
@@ -14,6 +15,19 @@ class ASurvivalCharacter : public AGLibGASCharacter
 
 public:
 	ASurvivalCharacter(const FObjectInitializer& ObjectInitializer);
+
+protected:
+	UPROPERTY(
+		BlueprintGetter = GetMovementState,
+		BlueprintSetter = SetMovementState
+	)
+	EMovementState CurrentMovementState;
+
+	UPROPERTY(
+		BlueprintGetter = GetPreviousMovementState,
+		BlueprintSetter = SetPreviousMovementState
+	)
+	EMovementState PreviousMovementState;
 
 private:
 	/** Camera boom positioning the camera behind the character */
@@ -38,8 +52,32 @@ protected:
 
 	void OnMovementSpeedChanged(const FOnAttributeChangeData& NewValue);
 
+	UFUNCTION(
+		BlueprintGetter,
+		Category = "SurvivalCharacter"
+	)
+	EMovementState GetMovementState() const;
+
+	UFUNCTION(
+		BlueprintSetter,
+		Category = "SurvivalCharacter"
+	)
+	void SetMovementState(EMovementState NewState);
+	
+	UFUNCTION(
+		BlueprintGetter,
+		Category = "SurvivalCharacter"
+	)
+	EMovementState GetPreviousMovementState() const;
+
+	UFUNCTION(
+		BlueprintSetter,
+		Category = "SurvivalCharacter"
+	)
+	void SetPreviousMovementState(EMovementState NewState);
+
+
 public:
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 };
-

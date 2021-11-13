@@ -31,13 +31,12 @@
 		},
 		{
 			"Name": "GradessLibrary",
-			"Enabled": true,
-			"MarketplaceURL": "https://github.com/Gradess2019/GradessLibrary"
+			"Enabled": true
 		},
 		{
 			"Name": "ALSV4_CPP",
 			"Enabled": true,
-			"MarketplaceURL": "https://github.com/dyanikoglu/ALS-Community/tree/main"
+			"MarketplaceURL": "https://www.unrealengine.com/marketplace/en-US/product/advanced-locomotion-system-v1"
 		}
 	],
 	"TargetPlatforms": [

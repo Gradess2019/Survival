@@ -57,6 +57,27 @@ void ASurvivalCharacter::OnMovementSpeedChanged(const FOnAttributeChangeData& Ne
 	GetCharacterMovement()->MaxWalkSpeed = NewValue.NewValue;
 }
 
+EMovementState ASurvivalCharacter::GetMovementState() const
+{
+	return CurrentMovementState;
+}
+
+void ASurvivalCharacter::SetMovementState(EMovementState NewState)
+{
+	SetPreviousMovementState(CurrentMovementState);
+	CurrentMovementState = NewState;
+}
+
+EMovementState ASurvivalCharacter::GetPreviousMovementState() const
+{
+	return PreviousMovementState;
+}
+
+void ASurvivalCharacter::SetPreviousMovementState(EMovementState NewState)
+{
+	PreviousMovementState = NewState;
+}
+
 void ASurvivalCharacter::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
