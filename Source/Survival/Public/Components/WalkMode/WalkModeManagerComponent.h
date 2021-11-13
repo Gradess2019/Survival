@@ -53,6 +53,12 @@ public:
 	)
 	ESurvivalMovementMode GetCurrentMovementMode() const;
 
+	UFUNCTION(
+		BlueprintPure,
+		Category = "WalkMode"
+	)
+	static UWalkModeManagerComponent*  GetWalkModeManager(const AActor* Actor);
+
 protected:
 	UFUNCTION()
 	void SetMovementMode(ESurvivalMovementMode NewMode);
