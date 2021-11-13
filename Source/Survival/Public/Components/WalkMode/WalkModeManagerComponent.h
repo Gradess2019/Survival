@@ -65,15 +65,15 @@ public:
 	)
 	static UWalkModeManagerComponent* GetWalkModeManager(const AActor* Actor);
 
+	UFUNCTION()
+	void OnPressMoveAction(FKey Key);
+
 protected:
 	UFUNCTION()
 	void SetMovementModeToDefaultIfMoving();
 
 	UFUNCTION()
 	void UpdateMovementMode();
-
-	UFUNCTION()
-	void OnPressMoveAction(FKey Key);
 
 private:
 	UPROPERTY(

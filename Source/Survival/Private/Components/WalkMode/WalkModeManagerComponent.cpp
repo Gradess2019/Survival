@@ -34,8 +34,6 @@ void UWalkModeManagerComponent::InitializeComponent()
 
 	Character = GetOwner<ASurvivalCharacter>();
 	check(Character);
-
-	Character->OnPressMoveKey.AddDynamic(this, &UWalkModeManagerComponent::OnPressMoveAction);
 }
 
 void UWalkModeManagerComponent::ToggleWalkMode()
