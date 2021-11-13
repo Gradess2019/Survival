@@ -55,6 +55,24 @@ protected:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	void OnMovementSpeedChanged(const FOnAttributeChangeData& Data);
+	
+	UFUNCTION()
+	void OnMoveActionPressed(FKey Key);
+	
+	UFUNCTION()
+	void OnMoveActionReleased(FKey Key);
+
+	UFUNCTION()
+	void OnToggleWalkModePressed(FKey Key);
+
+	UFUNCTION()
+	void OnToggleCrouchPressed(FKey Key);
+
+	UFUNCTION()
+	void OnSprintPressed(FKey Key);
+
+	UFUNCTION()
+	void OnSprintReleased(FKey Key);
 
 protected:
 	/** Camera boom positioning the camera behind the character */
