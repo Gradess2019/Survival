@@ -7,11 +7,13 @@
 #include "GameFramework/Character.h"
 #include "SurvivalCharacter.generated.h"
 
+
 #pragma region Forward declarations
 class UWalkModeManagerComponent;
 class UCameraComponent;
 class USpringArmComponent;
 #pragma endregion Forward declarations
+
 
 #pragma region Delegate declarations
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPressMoveKey, FKey, Key);
@@ -19,7 +21,11 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnReleaseMoveKey, FKey, Key);
 #pragma endregion Delegate declarations
 
 
-UCLASS(config=Game)
+UCLASS(
+	Blueprintable,
+	BlueprintType,
+	ClassGroup = Survival
+)
 class ASurvivalCharacter : public AGLibGASCharacter
 {
 	GENERATED_BODY()
@@ -27,12 +33,18 @@ class ASurvivalCharacter : public AGLibGASCharacter
 public:
 	ASurvivalCharacter(const FObjectInitializer& ObjectInitializer);
 
+	/**
+	 * @brief Executes when any MoveAction key was pressed
+	 */
 	UPROPERTY(
 		BlueprintAssignable,
 		Category = "SurvivalCharacter"
 	)
 	FOnPressMoveKey OnPressMoveKey;
 
+	/**
+	 * @brief Executes when any MoveAction key was released
+	 */
 	UPROPERTY(
 		BlueprintAssignable,
 		Category = "SurvivalCharacter"
@@ -77,7 +89,7 @@ protected:
 		BlueprintReadOnly,
 		Category = "Camera"
 	)
-	USpringArmComponent* CameraBoom;
+	USpringArmComponent* SpringArm;
 
 	/** Follow camera */
 	UPROPERTY(
@@ -85,7 +97,7 @@ protected:
 		BlueprintReadOnly,
 		Category = "Camera"
 	)
-	UCameraComponent* FollowCamera;
+	UCameraComponent* Camera;
 
 	UPROPERTY(
 		VisibleAnywhere,

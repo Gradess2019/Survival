@@ -30,21 +30,21 @@ ASurvivalCharacter::ASurvivalCharacter(const FObjectInitializer& ObjectInitializ
 	GetCharacterMovement()->AirControl = 0.f;
 
 	// Create a camera boom (pulls in towards the player if there is a collision)
-	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
-	CameraBoom->SetupAttachment(RootComponent);
-	CameraBoom->TargetArmLength = 1000.f;
-	CameraBoom->bUsePawnControlRotation = false;
-	CameraBoom->bDoCollisionTest = false;
-	CameraBoom->bInheritPitch = false;
-	CameraBoom->bInheritYaw = false;
-	CameraBoom->bInheritRoll = false;
-	CameraBoom->PrimaryComponentTick.bStartWithTickEnabled = false;
-	CameraBoom->SetRelativeRotation(FRotator(-45.f, -45.f, 0.f));
+	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
+	SpringArm->SetupAttachment(RootComponent);
+	SpringArm->TargetArmLength = 1000.f;
+	SpringArm->bUsePawnControlRotation = false;
+	SpringArm->bDoCollisionTest = false;
+	SpringArm->bInheritPitch = false;
+	SpringArm->bInheritYaw = false;
+	SpringArm->bInheritRoll = false;
+	SpringArm->PrimaryComponentTick.bStartWithTickEnabled = false;
+	SpringArm->SetRelativeRotation(FRotator(-45.f, -45.f, 0.f));
 
 	// Create a follow camera
-	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
-	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
-	FollowCamera->bUsePawnControlRotation = false;
+	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
+	Camera->SetupAttachment(SpringArm, USpringArmComponent::SocketName);
+	Camera->bUsePawnControlRotation = false;
 
 	WalkModeManager = CreateDefaultSubobject<UWalkModeManagerComponent>(TEXT("WalkModeManager"));
 }
@@ -123,7 +123,7 @@ void ASurvivalCharacter::MoveForward(float Value)
 {
 	if (Controller != nullptr && Value != 0.0f)
 	{
-		const FRotator Rotation = CameraBoom->GetRelativeRotation();
+		const FRotator Rotation = SpringArm->GetRelativeRotation();
 		const FRotator YawRotation(0, Rotation.Yaw, 0);
 
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
@@ -135,7 +135,7 @@ void ASurvivalCharacter::MoveRight(float Value)
 {
 	if (Controller != nullptr && Value != 0.0f)
 	{
-		const FRotator Rotation = CameraBoom->GetRelativeRotation();
+		const FRotator Rotation = SpringArm->GetRelativeRotation();
 		const FRotator YawRotation(0, Rotation.Yaw, 0);
 
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);

@@ -8,7 +8,9 @@
 #include "GridLibrary.generated.h"
 
 
-UCLASS()
+UCLASS(
+	ClassGroup = Survival
+)
 class SURVIVAL_API UGridLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()

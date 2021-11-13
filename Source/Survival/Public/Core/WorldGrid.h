@@ -8,14 +8,17 @@
 #include "WorldGrid/IntVector2D.h"
 #include "WorldGrid.generated.h"
 
+
 #pragma region Log
 DECLARE_LOG_CATEGORY_EXTERN(LogWorldGrid, Log, All);
 #pragma endregion Log
+
 
 #pragma region Forward declarations
 class UGridCell;
 class AWallBuilder;
 #pragma endregion Forward declarations
+
 
 /**
  * @brief Actor that manages creation, deletion, saving, loading grid cells
@@ -23,7 +26,7 @@ class AWallBuilder;
 UCLASS(
 	Blueprintable,
 	BlueprintType,
-	ClassGroup=Survival
+	ClassGroup = Survival
 )
 class SURVIVAL_API AWorldGrid : public AActor, public IGrid
 {
