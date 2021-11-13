@@ -50,7 +50,7 @@ protected:
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	void OnMovementSpeedChanged(const FOnAttributeChangeData& NewValue);
+	void OnMovementSpeedChanged(const FOnAttributeChangeData& Data);
 
 	UFUNCTION(
 		BlueprintGetter,

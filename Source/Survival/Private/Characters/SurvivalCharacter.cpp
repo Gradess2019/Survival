@@ -52,9 +52,10 @@ void ASurvivalCharacter::SetupPlayerInputComponent(class UInputComponent* Player
 	PlayerInputComponent->BindAxis("MoveRight", this, &ASurvivalCharacter::MoveRight);
 }
 
-void ASurvivalCharacter::OnMovementSpeedChanged(const FOnAttributeChangeData& NewValue)
+void ASurvivalCharacter::OnMovementSpeedChanged(const FOnAttributeChangeData& Data)
 {
-	GetCharacterMovement()->MaxWalkSpeed = NewValue.NewValue;
+	GetCharacterMovement()->MaxWalkSpeed = Data.NewValue;
+	GetCharacterMovement()->MaxWalkSpeedCrouched = Data.NewValue;
 }
 
 EMovementState ASurvivalCharacter::GetMovementState() const
