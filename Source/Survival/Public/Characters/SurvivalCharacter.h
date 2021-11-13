@@ -7,6 +7,18 @@
 #include "GameFramework/Character.h"
 #include "SurvivalCharacter.generated.h"
 
+#pragma region Forward declarations
+class UWalkModeManagerComponent;
+class UCameraComponent;
+class USpringArmComponent;
+#pragma endregion Forward declarations
+
+#pragma region Delegate declarations
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPressMoveKey, FKey, Key);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnReleaseMoveKey, FKey, Key);
+#pragma endregion Delegate declarations
+
+
 UCLASS(config=Game)
 class ASurvivalCharacter : public AGLibGASCharacter
 {
@@ -15,16 +27,18 @@ class ASurvivalCharacter : public AGLibGASCharacter
 public:
 	ASurvivalCharacter(const FObjectInitializer& ObjectInitializer);
 
-private:
-	/** Camera boom positioning the camera behind the character */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	class USpringArmComponent* CameraBoom;
+	UPROPERTY(
+		BlueprintAssignable,
+		Category = "SurvivalCharacter"
+	)
+	FOnPressMoveKey OnPressMoveKey;
 
-	/** Follow camera */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	class UCameraComponent* FollowCamera;
+	UPROPERTY(
+		BlueprintAssignable,
+		Category = "SurvivalCharacter"
+	)
+	FOnReleaseMoveKey OnReleaseMoveKey;
 
-public:
 	virtual void PostInitializeComponents() override;
 
 protected:
@@ -36,10 +50,47 @@ protected:
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	void OnMovementSpeedChanged(const FOnAttributeChangeData& NewValue);
+	void OnMovementSpeedChanged(const FOnAttributeChangeData& Data);
+	
+	UFUNCTION()
+	void OnMoveActionPressed(FKey Key);
+	
+	UFUNCTION()
+	void OnMoveActionReleased(FKey Key);
 
-public:
-	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
-	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+	UFUNCTION()
+	void OnToggleWalkModePressed(FKey Key);
+
+	UFUNCTION()
+	void OnToggleCrouchPressed(FKey Key);
+
+	UFUNCTION()
+	void OnSprintPressed(FKey Key);
+
+	UFUNCTION()
+	void OnSprintReleased(FKey Key);
+
+protected:
+	/** Camera boom positioning the camera behind the character */
+	UPROPERTY(
+		VisibleAnywhere,
+		BlueprintReadOnly,
+		Category = "Camera"
+	)
+	USpringArmComponent* CameraBoom;
+
+	/** Follow camera */
+	UPROPERTY(
+		VisibleAnywhere,
+		BlueprintReadOnly,
+		Category = "Camera"
+	)
+	UCameraComponent* FollowCamera;
+
+	UPROPERTY(
+		VisibleAnywhere,
+		BlueprintReadOnly,
+		Category = "WalkMode"
+	)
+	UWalkModeManagerComponent* WalkModeManager;
 };
-
