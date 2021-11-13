@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "Characters/GLibGASCharacter.h"
-#include "Components/WalkMode/WalkModeOwner.h"
 #include "GameFramework/Character.h"
 #include "SurvivalCharacter.generated.h"
 
@@ -21,7 +20,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnReleaseMoveKey, FKey, Key);
 
 
 UCLASS(config=Game)
-class ASurvivalCharacter : public AGLibGASCharacter, public IWalkModeOwner
+class ASurvivalCharacter : public AGLibGASCharacter
 {
 	GENERATED_BODY()
 
@@ -39,9 +38,6 @@ public:
 		Category = "SurvivalCharacter"
 	)
 	FOnReleaseMoveKey OnReleaseMoveKey;
-
-	virtual ESurvivalMovementMode GetCurrentMovementMode_Implementation() override;
-	virtual ESurvivalMovementMode GetDefaultMovementMode_Implementation() override;
 
 	virtual void PostInitializeComponents() override;
 

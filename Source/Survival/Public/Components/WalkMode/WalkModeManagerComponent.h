@@ -5,12 +5,12 @@
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
 #include "Components/ActorComponent.h"
+#include "Enums/SurvivalMovementMode.h"
 #include "WalkModeManagerComponent.generated.h"
 
 
 #pragma region Forward declarations
 class ASurvivalCharacter;
-enum class ESurvivalMovementMode : uint8;
 #pragma endregion Forward declarations
 
 

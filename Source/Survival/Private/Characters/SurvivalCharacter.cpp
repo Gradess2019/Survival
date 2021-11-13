@@ -106,16 +106,6 @@ void ASurvivalCharacter::OnSprintReleased(FKey Key)
 	WalkModeManager->ToggleSprint();
 }
 
-ESurvivalMovementMode ASurvivalCharacter::GetCurrentMovementMode_Implementation()
-{
-	return WalkModeManager->GetCurrentMovementMode();
-}
-
-ESurvivalMovementMode ASurvivalCharacter::GetDefaultMovementMode_Implementation()
-{
-	return WalkModeManager->GetDefaultMovementMode();
-}
-
 void ASurvivalCharacter::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
