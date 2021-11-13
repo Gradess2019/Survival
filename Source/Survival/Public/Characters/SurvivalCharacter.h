@@ -4,9 +4,15 @@
 
 #include "CoreMinimal.h"
 #include "Characters/GLibGASCharacter.h"
-#include "Enums/MovementState.h"
 #include "GameFramework/Character.h"
 #include "SurvivalCharacter.generated.h"
+
+
+#pragma region Delegate declarations
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPressMoveKey, FKey, Key);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnReleaseMoveKey, FKey, Key);
+#pragma endregion Delegate declarations
+
 
 UCLASS(config=Game)
 class ASurvivalCharacter : public AGLibGASCharacter
@@ -16,19 +22,18 @@ class ASurvivalCharacter : public AGLibGASCharacter
 public:
 	ASurvivalCharacter(const FObjectInitializer& ObjectInitializer);
 
-protected:
 	UPROPERTY(
-		BlueprintGetter = GetMovementState,
-		BlueprintSetter = SetMovementState
+		BlueprintAssignable,
+		Category = "SurvivalCharacter"
 	)
-	EMovementState CurrentMovementState;
-
+	FOnPressMoveKey OnPressMoveKey;
+	
 	UPROPERTY(
-		BlueprintGetter = GetPreviousMovementState,
-		BlueprintSetter = SetPreviousMovementState
+		BlueprintAssignable,
+		Category = "SurvivalCharacter"
 	)
-	EMovementState PreviousMovementState;
-
+	FOnReleaseMoveKey OnReleaseMoveKey;
+	
 private:
 	/** Camera boom positioning the camera behind the character */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
@@ -51,31 +56,6 @@ protected:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	void OnMovementSpeedChanged(const FOnAttributeChangeData& Data);
-
-	UFUNCTION(
-		BlueprintGetter,
-		Category = "SurvivalCharacter"
-	)
-	EMovementState GetMovementState() const;
-
-	UFUNCTION(
-		BlueprintSetter,
-		Category = "SurvivalCharacter"
-	)
-	void SetMovementState(EMovementState NewState);
-	
-	UFUNCTION(
-		BlueprintGetter,
-		Category = "SurvivalCharacter"
-	)
-	EMovementState GetPreviousMovementState() const;
-
-	UFUNCTION(
-		BlueprintSetter,
-		Category = "SurvivalCharacter"
-	)
-	void SetPreviousMovementState(EMovementState NewState);
-
 
 public:
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }

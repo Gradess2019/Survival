@@ -50,33 +50,21 @@ void ASurvivalCharacter::SetupPlayerInputComponent(class UInputComponent* Player
 
 	PlayerInputComponent->BindAxis("MoveForward", this, &ASurvivalCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &ASurvivalCharacter::MoveRight);
+
+	FInputActionBinding MoveKeyPressed("MoveAction", IE_Pressed);
+	MoveKeyPressed.ActionDelegate.GetDelegateWithKeyForManualSet().BindLambda([this](FKey Key) { OnPressMoveKey.Broadcast(Key); });
+
+	FInputActionBinding MoveKeyReleased("MoveAction", IE_Released);
+	MoveKeyReleased.ActionDelegate.GetDelegateWithKeyForManualSet().BindLambda([this](FKey Key) { OnReleaseMoveKey.Broadcast(Key); });
+
+	PlayerInputComponent->AddActionBinding(MoveKeyPressed);
+	PlayerInputComponent->AddActionBinding(MoveKeyReleased);
 }
 
 void ASurvivalCharacter::OnMovementSpeedChanged(const FOnAttributeChangeData& Data)
 {
 	GetCharacterMovement()->MaxWalkSpeed = Data.NewValue;
 	GetCharacterMovement()->MaxWalkSpeedCrouched = Data.NewValue;
-}
-
-EMovementState ASurvivalCharacter::GetMovementState() const
-{
-	return CurrentMovementState;
-}
-
-void ASurvivalCharacter::SetMovementState(EMovementState NewState)
-{
-	SetPreviousMovementState(CurrentMovementState);
-	CurrentMovementState = NewState;
-}
-
-EMovementState ASurvivalCharacter::GetPreviousMovementState() const
-{
-	return PreviousMovementState;
-}
-
-void ASurvivalCharacter::SetPreviousMovementState(EMovementState NewState)
-{
-	PreviousMovementState = NewState;
 }
 
 void ASurvivalCharacter::PostInitializeComponents()
