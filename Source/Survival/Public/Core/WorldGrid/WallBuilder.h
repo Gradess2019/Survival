@@ -9,6 +9,7 @@
 #include "GameFramework/Actor.h"
 #include "WallBuilder.generated.h"
 
+
 #pragma region Forward declarations
 class IGrid;
 #pragma endregion Forward declarations
@@ -19,7 +20,8 @@ class IGrid;
  */
 UCLASS(
 	BlueprintType,
-	Blueprintable
+	Blueprintable,
+	ClassGroup = Survival
 )
 class SURVIVAL_API AWallBuilder : public AActor
 {
