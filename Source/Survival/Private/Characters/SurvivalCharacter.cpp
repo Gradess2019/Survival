@@ -5,6 +5,7 @@
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
+#include "Components/WalkMode/WalkModeManagerComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 
@@ -25,19 +26,27 @@ ASurvivalCharacter::ASurvivalCharacter(const FObjectInitializer& ObjectInitializ
 	// Configure character movement
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 540.0f, 0.0f);
-	GetCharacterMovement()->JumpZVelocity = 600.f;
-	GetCharacterMovement()->AirControl = 0.2f;
+	GetCharacterMovement()->JumpZVelocity = 0.f;
+	GetCharacterMovement()->AirControl = 0.f;
 
 	// Create a camera boom (pulls in towards the player if there is a collision)
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
-	CameraBoom->TargetArmLength = 300.0f;
-	CameraBoom->bUsePawnControlRotation = true;
+	CameraBoom->TargetArmLength = 1000.f;
+	CameraBoom->bUsePawnControlRotation = false;
+	CameraBoom->bDoCollisionTest = false;
+	CameraBoom->bInheritPitch = false;
+	CameraBoom->bInheritYaw = false;
+	CameraBoom->bInheritRoll = false;
+	CameraBoom->PrimaryComponentTick.bStartWithTickEnabled = false;
+	CameraBoom->SetRelativeRotation(FRotator(-45.f, -45.f, 0.f));
 
 	// Create a follow camera
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	FollowCamera->bUsePawnControlRotation = false;
+
+	WalkModeManager = CreateDefaultSubobject<UWalkModeManagerComponent>(TEXT("WalkModeManager"));
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -65,6 +74,16 @@ void ASurvivalCharacter::OnMovementSpeedChanged(const FOnAttributeChangeData& Da
 {
 	GetCharacterMovement()->MaxWalkSpeed = Data.NewValue;
 	GetCharacterMovement()->MaxWalkSpeedCrouched = Data.NewValue;
+}
+
+ESurvivalMovementMode ASurvivalCharacter::GetCurrentMovementMode_Implementation()
+{
+	return WalkModeManager->GetCurrentMovementMode();
+}
+
+ESurvivalMovementMode ASurvivalCharacter::GetDefaultMovementMode_Implementation()
+{
+	return WalkModeManager->GetDefaultMovementMode();
 }
 
 void ASurvivalCharacter::PostInitializeComponents()
