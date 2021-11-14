@@ -47,7 +47,8 @@ void ULineOfSightComponent::TickComponent(
 
 FHitResult ULineOfSightComponent::LaunchTrace(
 	const FVector& Start,
-	const FVector& End
+	const FVector& End,
+	const bool bForceDraw
 ) const
 {
 	FHitResult Hit;
@@ -59,7 +60,7 @@ FHitResult ULineOfSightComponent::LaunchTrace(
 		QueryType,
 		false,
 		{},
-		DebugType,
+		bForceDraw ? EDrawDebugTrace::ForOneFrame : DebugType,
 		Hit,
 		true,
 		TraceColor,
@@ -80,14 +81,70 @@ void ULineOfSightComponent::LaunchTraces(TArray<FHitResult>& Hits) const
 
 	const auto Start = GetComponentLocation();
 	const auto Forward = GetForwardVector();
-	
+
+	TArray<FHitResult> BaseHits;
+	BaseHits.Reserve(Hits.Num());
 	for (int Id = -HalfTraceNumber; Id <= HalfTraceNumber; ++Id)
 	{
 		const auto TraceAngle = Id * AnglePerTrace;
 		const auto TraceDirection = Forward.RotateAngleAxis(TraceAngle, FVector::UpVector);
 		const auto End = Start + TraceDirection * Distance;
 
-		Hits.Add(LaunchTrace(Start, End));
+		BaseHits.Add(LaunchTrace(Start, End));
+	}
+
+	for (int Id = 0; Id < BaseHits.Num() - 1; ++Id)
+	{
+		const auto& CurrentBaseHit = BaseHits[Id];
+		Hits.Add(CurrentBaseHit);
+
+		const auto DistanceToX = [&CurrentBaseHit]()
+		{
+			return FMath::PointDistToLine(CurrentBaseHit.bBlockingHit ? CurrentBaseHit.Location : CurrentBaseHit.TraceEnd, FVector::ForwardVector, FVector::ZeroVector);
+		}();
+
+		const auto DistanceToY = [&CurrentBaseHit]()
+		{
+			return FMath::PointDistToLine(CurrentBaseHit.bBlockingHit ? CurrentBaseHit.Location : CurrentBaseHit.TraceEnd, FVector::RightVector, FVector::ZeroVector);
+		}();
+
+		for (; Id < BaseHits.Num() - 1;)
+		{
+			Id++;
+			const auto& NextBaseHit = BaseHits[Id];
+			const auto NextDistanceToX = [&NextBaseHit]()
+			{
+				return FMath::PointDistToLine(NextBaseHit.bBlockingHit ? NextBaseHit.Location : NextBaseHit.TraceEnd, FVector::ForwardVector, FVector::ZeroVector);
+			}();
+
+			const auto NextDistanceToY = [&NextBaseHit]()
+			{
+				return FMath::PointDistToLine(NextBaseHit.bBlockingHit ? NextBaseHit.Location : NextBaseHit.TraceEnd, FVector::RightVector, FVector::ZeroVector);
+			}();
+
+			if (FMath::IsNearlyEqual(DistanceToX, NextDistanceToX, 1.f) || FMath::IsNearlyEqual(DistanceToY, NextDistanceToY, 1.f))
+			{
+				continue;
+			} else
+			{
+				const auto& PreviousHit = BaseHits[Id - 1];
+
+				if (PreviousHit.TraceEnd != CurrentBaseHit.TraceEnd)
+				{
+					Hits.Add(PreviousHit);
+				}
+				
+				Id--;
+				break;
+			}
+		}
+	}
+
+	Hits.Add(BaseHits.Last());
+
+	for (const auto& Hit : Hits)
+	{
+		LaunchTrace(Hit.TraceStart, Hit.TraceEnd, true);
 	}
 }
 
@@ -120,7 +177,7 @@ void ULineOfSightComponent::DrawHits(TArray<FHitResult>& Hits)
 	TArray<FCanvasUVTri> Triangles;
 
 	const auto Center = Size / 2.f;
-	const auto TextureBorderMargin = Distance * 0.1;
+	const auto TextureBorderMargin = 50.f;
 	const auto VectorToTextureSpaceScale = Center.X / (Distance + TextureBorderMargin);
 	const auto ActorLocation = FVector2D(GetOwner()->GetActorLocation()) * VectorToTextureSpaceScale;
 	const auto Color = FColor(255, 255, 255, 0.f);

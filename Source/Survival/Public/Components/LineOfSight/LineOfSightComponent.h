@@ -36,7 +36,8 @@ public:
 	)
 	FHitResult LaunchTrace(
 		const FVector& Start,
-		const FVector& End
+		const FVector& End,
+		const bool bForceDraw = false
 	) const;
 
 	UFUNCTION(
