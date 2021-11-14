@@ -7,6 +7,11 @@
 #include "LineOfSightComponent.generated.h"
 
 
+#pragma region Log
+DECLARE_LOG_CATEGORY_EXTERN(LogLineOfSight, Log, All);
+#pragma endregion Log
+
+
 UCLASS(
 	Blueprintable,
 	BlueprintType,
@@ -57,6 +62,18 @@ protected:
 		EditAnywhere,
 		Category = "LineOfSight"
 	)
+	int32 PreciseCount;
+
+	UPROPERTY(
+		EditAnywhere,
+		Category = "LineOfSight"
+	)
+	float PreciseAngle;
+
+	UPROPERTY(
+		EditAnywhere,
+		Category = "LineOfSight"
+	)
 	float Angle;
 
 	UPROPERTY(
@@ -78,6 +95,12 @@ protected:
 	UMaterialParameterCollection* SightParams;
 
 #pragma region Debug
+	UPROPERTY(
+		EditAnywhere,
+		Category = "LineOfSight|Debug"
+	)
+	bool bMeasureTime;
+	
 	UPROPERTY(
 		EditAnywhere,
 		Category = "LineOfSight|Debug"
@@ -115,4 +138,7 @@ protected:
 
 	UFUNCTION(BlueprintCallable)
 	void DrawHits(UPARAM(ref) TArray<FHitResult>& Hits);
+
+	UFUNCTION()
+	FVector GetEndPoint(const FHitResult& Hit) const;
 };

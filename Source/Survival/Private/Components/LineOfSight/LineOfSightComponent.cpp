@@ -3,9 +3,16 @@
 
 #include "Components/LineOfSight/LineOfSightComponent.h"
 
+#include "Core/GLibMathLibrary.h"
 #include "Engine/Canvas.h"
 #include "Kismet/KismetMaterialLibrary.h"
 #include "Kismet/KismetRenderingLibrary.h"
+#include "VisualLogger/VisualLogger.h"
+
+
+#pragma region Log
+DEFINE_LOG_CATEGORY(LogLineOfSight);
+#pragma endregion Log
 
 
 ULineOfSightComponent::ULineOfSightComponent()
@@ -13,7 +20,9 @@ ULineOfSightComponent::ULineOfSightComponent()
 	PrimaryComponentTick.bCanEverTick = true;
 	PrimaryComponentTick.bStartWithTickEnabled = true;
 
-	TraceNumber = 30;
+	TraceNumber = 150;
+	PreciseCount = 8;
+	PreciseAngle = 0.05f;
 	Angle = 100.f;
 	Distance = 2000.f;
 	QueryType = UEngineTypes::ConvertToTraceType(ECC_Visibility);
@@ -35,7 +44,8 @@ void ULineOfSightComponent::TickComponent(
 	FActorComponentTickFunction* ThisTickFunction
 )
 {
-	SCOPE_LOG_TIME_FUNC();
+	CONDITIONAL_SCOPE_LOG_TIME_FUNC(bMeasureTime);
+	
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	TArray<FHitResult> Hits;
@@ -98,42 +108,90 @@ void ULineOfSightComponent::LaunchTraces(TArray<FHitResult>& Hits) const
 		const auto& CurrentBaseHit = BaseHits[Id];
 		Hits.Add(CurrentBaseHit);
 
-		const auto DistanceToX = [&CurrentBaseHit]()
+		const auto DistanceToX = [&]()
 		{
-			return FMath::PointDistToLine(CurrentBaseHit.bBlockingHit ? CurrentBaseHit.Location : CurrentBaseHit.TraceEnd, FVector::ForwardVector, FVector::ZeroVector);
+			return FMath::PointDistToLine(CurrentBaseHit.Location, FVector::ForwardVector, FVector::ZeroVector);
 		}();
 
-		const auto DistanceToY = [&CurrentBaseHit]()
+		const auto DistanceToY = [&]()
 		{
-			return FMath::PointDistToLine(CurrentBaseHit.bBlockingHit ? CurrentBaseHit.Location : CurrentBaseHit.TraceEnd, FVector::RightVector, FVector::ZeroVector);
+			return FMath::PointDistToLine(CurrentBaseHit.Location, FVector::RightVector, FVector::ZeroVector);
 		}();
 
 		for (; Id < BaseHits.Num() - 1;)
 		{
 			Id++;
 			const auto& NextBaseHit = BaseHits[Id];
-			const auto NextDistanceToX = [&NextBaseHit]()
+
+			if (!CurrentBaseHit.bBlockingHit && !NextBaseHit.bBlockingHit)
 			{
-				return FMath::PointDistToLine(NextBaseHit.bBlockingHit ? NextBaseHit.Location : NextBaseHit.TraceEnd, FVector::ForwardVector, FVector::ZeroVector);
+				Hits.Add(NextBaseHit);
+				continue;
+			}
+
+			const auto NextDistanceToX = [&]()
+			{
+				return FMath::PointDistToLine(NextBaseHit.Location, FVector::ForwardVector, FVector::ZeroVector);
 			}();
 
-			const auto NextDistanceToY = [&NextBaseHit]()
+			const auto NextDistanceToY = [&]()
 			{
-				return FMath::PointDistToLine(NextBaseHit.bBlockingHit ? NextBaseHit.Location : NextBaseHit.TraceEnd, FVector::RightVector, FVector::ZeroVector);
+				return FMath::PointDistToLine(NextBaseHit.Location, FVector::RightVector, FVector::ZeroVector);
 			}();
 
-			if (FMath::IsNearlyEqual(DistanceToX, NextDistanceToX, 1.f) || FMath::IsNearlyEqual(DistanceToY, NextDistanceToY, 1.f))
+			if (FMath::IsNearlyEqual(DistanceToX, NextDistanceToX, 1.f) || FMath::IsNearlyEqual(
+				DistanceToY, NextDistanceToY, 1.f))
 			{
 				continue;
-			} else
+			}
+			else
 			{
-				const auto& PreviousHit = BaseHits[Id - 1];
+				auto LeftHit = BaseHits[Id - 1];
+				auto RightHit = NextBaseHit;
 
-				if (PreviousHit.TraceEnd != CurrentBaseHit.TraceEnd)
+				for (int32 Count = 0; Count < PreciseCount; ++Count)
 				{
-					Hits.Add(PreviousHit);
+					auto LeftDirection = LeftHit.TraceEnd - LeftHit.TraceStart;
+					auto RightDirection = RightHit.TraceEnd - RightHit.TraceStart;
+
+					LeftDirection.Normalize();
+					RightDirection.Normalize();
+
+					const auto CurrentAngle = UGLibMathLibrary::ShortestAngleBetweenVectorsInDegrees(
+						LeftDirection, RightDirection);
+					if (CurrentAngle <= PreciseAngle) { break; }
+
+					auto MiddleDirection = LeftDirection + RightDirection;
+					MiddleDirection.Normalize();
+
+					auto MiddleEnd = MiddleDirection * Distance + Start;
+					auto MiddleHit = LaunchTrace(Start, MiddleEnd);
+					MiddleEnd = GetEndPoint(MiddleHit);
+
+					const auto MiddleDistanceToX = [&]()
+					{
+						return FMath::PointDistToLine(MiddleHit.Location, FVector::ForwardVector, FVector::ZeroVector);
+					}();
+
+					const auto MiddleDistanceToY = [&]()
+					{
+						return FMath::PointDistToLine(MiddleHit.Location, FVector::RightVector, FVector::ZeroVector);
+					}();
+
+					if (FMath::IsNearlyEqual(DistanceToX, MiddleDistanceToX, 1.f) || FMath::IsNearlyEqual(
+						DistanceToY, MiddleDistanceToY, 1.f))
+					{
+						LeftHit = MiddleHit;
+					}
+					else if (FMath::IsNearlyEqual(NextDistanceToX, MiddleDistanceToX, 1.f) || FMath::IsNearlyEqual(
+						NextDistanceToY, MiddleDistanceToY, 1.f))
+					{
+						RightHit = MiddleHit;
+					}
 				}
-				
+				Hits.Add(LeftHit);
+				Hits.Add(RightHit);
+
 				Id--;
 				break;
 			}
@@ -142,10 +200,10 @@ void ULineOfSightComponent::LaunchTraces(TArray<FHitResult>& Hits) const
 
 	Hits.Add(BaseHits.Last());
 
-	for (const auto& Hit : Hits)
-	{
-		LaunchTrace(Hit.TraceStart, Hit.TraceEnd, true);
-	}
+	// for (const auto& Hit : Hits)
+	// {
+	// 	LaunchTrace(Hit.TraceStart, Hit.TraceEnd, true);
+	// }
 }
 
 void ULineOfSightComponent::UpdateSightParams()
@@ -177,7 +235,7 @@ void ULineOfSightComponent::DrawHits(TArray<FHitResult>& Hits)
 	TArray<FCanvasUVTri> Triangles;
 
 	const auto Center = Size / 2.f;
-	const auto TextureBorderMargin = 50.f;
+	const auto TextureBorderMargin = 0.f;
 	const auto VectorToTextureSpaceScale = Center.X / (Distance + TextureBorderMargin);
 	const auto ActorLocation = FVector2D(GetOwner()->GetActorLocation()) * VectorToTextureSpaceScale;
 	const auto Color = FColor(255, 255, 255, 0.f);
@@ -205,4 +263,9 @@ void ULineOfSightComponent::DrawHits(TArray<FHitResult>& Hits)
 	}
 	Canvas->K2_DrawTriangle(nullptr, Triangles);
 	UKismetRenderingLibrary::EndDrawCanvasToRenderTarget(this, Context);
+}
+
+FVector ULineOfSightComponent::GetEndPoint(const FHitResult& Hit) const
+{
+	return Hit.bBlockingHit ? Hit.Location : Hit.TraceEnd;
 }
