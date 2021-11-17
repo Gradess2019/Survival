@@ -7,7 +7,6 @@
 #include "Engine/Canvas.h"
 #include "Kismet/KismetMaterialLibrary.h"
 #include "Kismet/KismetRenderingLibrary.h"
-#include "VisualLogger/VisualLogger.h"
 
 
 #pragma region Log
@@ -23,8 +22,9 @@ ULineOfSightComponent::ULineOfSightComponent()
 	TraceNumber = 150;
 	PreciseCount = 8;
 	PreciseAngle = 0.05f;
-	Angle = 100.f;
-	Distance = 2000.f;
+	Angle = 140.f;
+	ErrorTolerance = 1.f;
+	Distance = 6000.f;
 	QueryType = UEngineTypes::ConvertToTraceType(ECC_Visibility);
 
 	DebugType = EDrawDebugTrace::None;
@@ -50,9 +50,10 @@ void ULineOfSightComponent::TickComponent(
 
 	TArray<FHitResult> Hits;
 	LaunchTraces(Hits);
+	PreciseHits(BaseHits);
 
 	UpdateSightParams();
-	DrawHits(Hits);
+	DrawHits(PrecisedHits);
 }
 
 FHitResult ULineOfSightComponent::LaunchTrace(
@@ -81,19 +82,16 @@ FHitResult ULineOfSightComponent::LaunchTrace(
 	return Hit;
 }
 
-void ULineOfSightComponent::LaunchTraces(TArray<FHitResult>& Hits) const
+void ULineOfSightComponent::LaunchTraces(TArray<FHitResult>& OutHits)
 {
-	Hits.Reset(TraceNumber * 2);
+	BaseHits.Reset(TraceNumber * 2);
 
-	const auto HalfAngle = Angle / 2.f; // 45
 	const auto HalfTraceNumber = TraceNumber / 2; // 2
 	const auto AnglePerTrace = Angle / TraceNumber; // 22
 
 	const auto Start = GetComponentLocation();
 	const auto Forward = GetForwardVector();
 
-	TArray<FHitResult> BaseHits;
-	BaseHits.Reserve(Hits.Num());
 	for (int Id = -HalfTraceNumber; Id <= HalfTraceNumber; ++Id)
 	{
 		const auto TraceAngle = Id * AnglePerTrace;
@@ -103,94 +101,55 @@ void ULineOfSightComponent::LaunchTraces(TArray<FHitResult>& Hits) const
 		BaseHits.Add(LaunchTrace(Start, End));
 	}
 
+	OutHits = BaseHits;
+}
+
+bool ULineOfSightComponent::IsAnyHitDistanceEquals(const FHitResult& FirstHit, const FHitResult& SecondHit) const
+{
+	const auto DistanceToX = GetDistanceToX(FirstHit.Location);
+	const auto DistanceToY = GetDistanceToY(FirstHit.Location);
+	
+	const auto NextDistanceToX = GetDistanceToX(SecondHit.Location);
+	const auto NextDistanceToY = GetDistanceToY(SecondHit.Location);
+	
+	return IsAnyDistanceEquals(DistanceToX, DistanceToY, NextDistanceToX, NextDistanceToY);
+}
+
+void ULineOfSightComponent::PreciseHits(TArray<FHitResult>& OutHits)
+{
+	if (BaseHits.Num() <= 0) { return; }
+	PrecisedHits.Reset(BaseHits.Num());
+
 	for (int Id = 0; Id < BaseHits.Num() - 1; ++Id)
 	{
 		const auto& CurrentBaseHit = BaseHits[Id];
-		Hits.Add(CurrentBaseHit);
+		PrecisedHits.Add(CurrentBaseHit);
 
-		const auto DistanceToX = [&]()
-		{
-			return FMath::PointDistToLine(CurrentBaseHit.Location, FVector::ForwardVector, FVector::ZeroVector);
-		}();
-
-		const auto DistanceToY = [&]()
-		{
-			return FMath::PointDistToLine(CurrentBaseHit.Location, FVector::RightVector, FVector::ZeroVector);
-		}();
-
-		for (; Id < BaseHits.Num() - 1;)
+		while (Id < BaseHits.Num() - 1)
 		{
 			Id++;
 			const auto& NextBaseHit = BaseHits[Id];
 
 			if (!CurrentBaseHit.bBlockingHit && !NextBaseHit.bBlockingHit)
 			{
-				Hits.Add(NextBaseHit);
+				PrecisedHits.Add(NextBaseHit);
 				continue;
 			}
 
-			const auto NextDistanceToX = [&]()
-			{
-				return FMath::PointDistToLine(NextBaseHit.Location, FVector::ForwardVector, FVector::ZeroVector);
-			}();
-
-			const auto NextDistanceToY = [&]()
-			{
-				return FMath::PointDistToLine(NextBaseHit.Location, FVector::RightVector, FVector::ZeroVector);
-			}();
-
-			if (FMath::IsNearlyEqual(DistanceToX, NextDistanceToX, 1.f) || FMath::IsNearlyEqual(
-				DistanceToY, NextDistanceToY, 1.f))
+			if (IsAnyHitDistanceEquals(CurrentBaseHit, NextBaseHit))
 			{
 				continue;
 			}
 			else
 			{
+				// We want to continue checking from previous hit in next iteration, that is why we decrement Id
 				auto LeftHit = BaseHits[Id - 1];
 				auto RightHit = NextBaseHit;
-
-				for (int32 Count = 0; Count < PreciseCount; ++Count)
-				{
-					auto LeftDirection = LeftHit.TraceEnd - LeftHit.TraceStart;
-					auto RightDirection = RightHit.TraceEnd - RightHit.TraceStart;
-
-					LeftDirection.Normalize();
-					RightDirection.Normalize();
-
-					const auto CurrentAngle = UGLibMathLibrary::ShortestAngleBetweenVectorsInDegrees(
-						LeftDirection, RightDirection);
-					if (CurrentAngle <= PreciseAngle) { break; }
-
-					auto MiddleDirection = LeftDirection + RightDirection;
-					MiddleDirection.Normalize();
-
-					auto MiddleEnd = MiddleDirection * Distance + Start;
-					auto MiddleHit = LaunchTrace(Start, MiddleEnd);
-					MiddleEnd = GetEndPoint(MiddleHit);
-
-					const auto MiddleDistanceToX = [&]()
-					{
-						return FMath::PointDistToLine(MiddleHit.Location, FVector::ForwardVector, FVector::ZeroVector);
-					}();
-
-					const auto MiddleDistanceToY = [&]()
-					{
-						return FMath::PointDistToLine(MiddleHit.Location, FVector::RightVector, FVector::ZeroVector);
-					}();
-
-					if (FMath::IsNearlyEqual(DistanceToX, MiddleDistanceToX, 1.f) || FMath::IsNearlyEqual(
-						DistanceToY, MiddleDistanceToY, 1.f))
-					{
-						LeftHit = MiddleHit;
-					}
-					else if (FMath::IsNearlyEqual(NextDistanceToX, MiddleDistanceToX, 1.f) || FMath::IsNearlyEqual(
-						NextDistanceToY, MiddleDistanceToY, 1.f))
-					{
-						RightHit = MiddleHit;
-					}
-				}
-				Hits.Add(LeftHit);
-				Hits.Add(RightHit);
+				
+				PreciseHitsByBisectionMethod(LeftHit, RightHit);
+				
+				PrecisedHits.Add(LeftHit);
+				PrecisedHits.Add(RightHit);
 
 				Id--;
 				break;
@@ -198,12 +157,44 @@ void ULineOfSightComponent::LaunchTraces(TArray<FHitResult>& Hits) const
 		}
 	}
 
-	Hits.Add(BaseHits.Last());
+	PrecisedHits.Add(BaseHits.Last());
+	
+	OutHits = PrecisedHits;
+}
 
-	// for (const auto& Hit : Hits)
-	// {
-	// 	LaunchTrace(Hit.TraceStart, Hit.TraceEnd, true);
-	// }
+void ULineOfSightComponent::PreciseHitsByBisectionMethod(
+	FHitResult& LeftHit,
+	FHitResult& RightHit
+) const
+{
+	const auto Start = GetComponentLocation();
+
+	for (int32 Count = 0; Count < PreciseCount; ++Count)
+	{
+		auto LeftDirection = LeftHit.TraceEnd - LeftHit.TraceStart;
+		auto RightDirection = RightHit.TraceEnd - RightHit.TraceStart;
+
+		LeftDirection.Normalize();
+		RightDirection.Normalize();
+
+		if (IsAngleLessThanPreciseAngle(LeftDirection, RightDirection)) break;
+
+		auto MiddleDirection = LeftDirection + RightDirection;
+		MiddleDirection.Normalize();
+
+		auto MiddleEnd = MiddleDirection * Distance + Start;
+		auto MiddleHit = LaunchTrace(Start, MiddleEnd);
+		MiddleEnd = GetEndPoint(MiddleHit);
+
+		if (IsAnyHitDistanceEquals(LeftHit, MiddleHit))
+		{
+			LeftHit = MiddleHit;
+		}
+		else if (IsAnyHitDistanceEquals(RightHit, MiddleHit))
+		{
+			RightHit = MiddleHit;
+		}
+	}
 }
 
 void ULineOfSightComponent::UpdateSightParams()
@@ -246,10 +237,8 @@ void ULineOfSightComponent::DrawHits(TArray<FHitResult>& Hits)
 		const auto FirstHit = Hits[Id];
 		const auto SecondHit = Hits[Id + 1];
 
-		const auto FirstHitLocation =
-			FirstHit.bBlockingHit ? FVector2D(FirstHit.Location) : FVector2D(FirstHit.TraceEnd);
-		const auto SecondHitLocation =
-			SecondHit.bBlockingHit ? FVector2D(SecondHit.Location) : FVector2D(SecondHit.TraceEnd);
+		const auto FirstHitLocation = FVector2D(GetEndPoint(FirstHit));
+		const auto SecondHitLocation = FVector2D(GetEndPoint(SecondHit));
 
 		NewTriangle.V0_Pos = Center;
 		NewTriangle.V1_Pos = FirstHitLocation * VectorToTextureSpaceScale - ActorLocation + Center;
@@ -268,4 +257,56 @@ void ULineOfSightComponent::DrawHits(TArray<FHitResult>& Hits)
 FVector ULineOfSightComponent::GetEndPoint(const FHitResult& Hit) const
 {
 	return Hit.bBlockingHit ? Hit.Location : Hit.TraceEnd;
+}
+
+float ULineOfSightComponent::GetDistanceToAxis(
+	const FVector& Axis,
+	const FVector& Location
+) const
+{
+	return FMath::PointDistToLine(Location, Axis, FVector::ZeroVector);
+}
+
+float ULineOfSightComponent::GetDistanceToX(const FVector& Location) const
+{
+	return GetDistanceToAxis(FVector::ForwardVector, Location);
+}
+
+float ULineOfSightComponent::GetDistanceToY(const FVector& Location) const
+{
+	return GetDistanceToAxis(FVector::RightVector, Location);
+}
+
+bool ULineOfSightComponent::IsAnyDistanceEquals(
+	const float FirstDistanceToX,
+	const float FirstDistanceToY,
+	const float SecondDistanceToX,
+	const float SecondDistanceToY
+) const
+{
+	return
+		FMath::IsNearlyEqual(FirstDistanceToX, SecondDistanceToX, ErrorTolerance) ||
+		FMath::IsNearlyEqual(FirstDistanceToY, SecondDistanceToY, ErrorTolerance);
+}
+
+const TArray<FHitResult>& ULineOfSightComponent::GetBaseHits() const
+{
+	return BaseHits;
+}
+
+const TArray<FHitResult>& ULineOfSightComponent::GetPrecisedHits() const
+{
+	return PrecisedHits;
+}
+
+bool ULineOfSightComponent::IsAngleLessThanPreciseAngle(
+	const FVector& LeftDirection,
+	const FVector& RightDirection
+) const
+{
+	const auto CurrentAngle =
+		UGLibMathLibrary::ShortestAngleBetweenVectorsInDegrees(LeftDirection, RightDirection);
+	if (CurrentAngle <= PreciseAngle) { return true; }
+	
+	return false;
 }
