@@ -6,6 +6,8 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
 #include "Components/WalkMode/WalkModeManagerComponent.h"
+#include "Components/Zoom/ZoomComponent.h"
+
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 
@@ -45,6 +47,8 @@ ASurvivalCharacter::ASurvivalCharacter(const FObjectInitializer& ObjectInitializ
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->SetupAttachment(SpringArm, USpringArmComponent::SocketName);
 	Camera->bUsePawnControlRotation = false;
+
+	Zoom = CreateDefaultSubobject<UZoomComponent>(TEXT("Zoom"));
 
 	WalkModeManager = CreateDefaultSubobject<UWalkModeManagerComponent>(TEXT("WalkModeManager"));
 }
