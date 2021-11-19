@@ -27,8 +27,6 @@ class SURVIVAL_API ULineOfSightComponent : public USceneComponent
 public:
 	ULineOfSightComponent();
 
-	virtual void BeginPlay() override;
-
 	virtual void TickComponent(
 		float DeltaTime,
 		ELevelTick TickType,

@@ -33,11 +33,6 @@ ULineOfSightComponent::ULineOfSightComponent()
 	TraceHitColor = FLinearColor::Red;
 }
 
-void ULineOfSightComponent::BeginPlay()
-{
-	Super::BeginPlay();
-}
-
 void ULineOfSightComponent::TickComponent(
 	float DeltaTime,
 	ELevelTick TickType,
