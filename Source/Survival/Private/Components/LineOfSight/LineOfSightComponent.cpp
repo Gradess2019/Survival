@@ -193,15 +193,15 @@ bool ULineOfSightComponent::IsAngleLessThanPreciseAngle(
 }
 
 bool ULineOfSightComponent::IsAnyDistanceEquals(
-	const float FirstDistanceToX,
-	const float FirstDistanceToY,
-	const float SecondDistanceToX,
-	const float SecondDistanceToY
+	const float X1,
+	const float Y1,
+	const float X2,
+	const float Y2
 ) const
 {
 	return
-		FMath::IsNearlyEqual(FirstDistanceToX, SecondDistanceToX, ErrorTolerance) ||
-		FMath::IsNearlyEqual(FirstDistanceToY, SecondDistanceToY, ErrorTolerance);
+		FMath::IsNearlyEqual(X1, X2, ErrorTolerance) ||
+		FMath::IsNearlyEqual(Y1, Y2, ErrorTolerance);
 }
 
 bool ULineOfSightComponent::IsAnyHitDistanceEquals(const FHitResult& FirstHit, const FHitResult& SecondHit) const
