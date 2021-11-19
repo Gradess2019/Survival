@@ -86,8 +86,8 @@ void ULineOfSightComponent::LaunchTraces(TArray<FHitResult>& OutHits)
 {
 	BaseHits.Reset(TraceNumber * 2);
 
-	const auto HalfTraceNumber = TraceNumber / 2; // 2
-	const auto AnglePerTrace = Angle / TraceNumber; // 22
+	const auto HalfTraceNumber = TraceNumber / 2;
+	const auto AnglePerTrace = Angle / TraceNumber;
 
 	const auto Start = GetComponentLocation();
 	const auto Forward = GetForwardVector();
@@ -226,8 +226,7 @@ void ULineOfSightComponent::DrawHits(TArray<FHitResult>& Hits)
 	TArray<FCanvasUVTri> Triangles;
 
 	const auto Center = Size / 2.f;
-	const auto TextureBorderMargin = 0.f;
-	const auto VectorToTextureSpaceScale = Center.X / (Distance + TextureBorderMargin);
+	const auto VectorToTextureSpaceScale = Center.X / Distance;
 	const auto ActorLocation = FVector2D(GetOwner()->GetActorLocation()) * VectorToTextureSpaceScale;
 	const auto Color = FColor(255, 255, 255, 0.f);
 	for (int32 Id = 0; Id < Hits.Num() - 1; Id++)
