@@ -12,8 +12,6 @@ UZoomComponent::UZoomComponent()
 	PrimaryComponentTick.bStartWithTickEnabled = false;
 
 	bWantsInitializeComponent = true;
-
-	Speed = 5.f;
 }
 
 void UZoomComponent::InitializeComponent()
@@ -28,14 +26,14 @@ void UZoomComponent::InitializeComponent()
 
 void UZoomComponent::AddDelta(const float Delta)
 {
-	TargetLength += Delta;
+	TargetLength += Delta * Power * Invert ? -1.f: 1.f;
 }
 
 void UZoomComponent::Update()
 {
 	const auto DeltaTime = GetWorld()->DeltaTimeSeconds;
 
-	SpringArmComponent->TargetArmLength = FMath::Lerp(SpringArmComponent->TargetArmLength, TargetLength, DeltaTime);
+	SpringArmComponent->TargetArmLength = FMath::Lerp(SpringArmComponent->TargetArmLength, TargetLength, DeltaTime * Speed);
 }
 
 float UZoomComponent::GetTargetLength() const

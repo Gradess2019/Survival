@@ -42,7 +42,35 @@ protected:
 		BlueprintReadWrite,
 		Category = "ZoomComponent"
 	)
-	float Speed;
+	float Speed = 5.f;
+
+	UPROPERTY(
+		EditAnywhere,
+		BlueprintReadWrite,
+		Category = "ZoomComponent"
+	)
+	float Power = 60.f;
+
+	UPROPERTY(
+		EditAnywhere,
+		BlueprintReadWrite,
+		Category = "ZoomComponent"
+	)
+	float MinLength = 500.f;
+
+	UPROPERTY(
+		EditAnywhere,
+		BlueprintReadWrite,
+		Category = "ZoomComponent"
+	)
+	float MaxLength = 2000.f;
+
+	UPROPERTY(
+		EditAnywhere,
+		BlueprintReadWrite,
+		Category = "ZoomComponent"
+	)
+	bool Invert = true;
 
 	UPROPERTY(
 		BlueprintGetter = "GetTargetLength",
