@@ -51,16 +51,17 @@ public:
 	)
 	void LaunchTraces(UPARAM(DisplayName = "Hits") TArray<FHitResult>& OutHits);
 	
-	void PreciseHitsByBisectionMethod(
-		FHitResult& LeftHit,
-		FHitResult& RightHit
-	) const;
-
 	UFUNCTION(
 		BlueprintCallable,
 		Category = "LineOfSight"
 	)
 	void PreciseHits(UPARAM(DisplayName = "Hits") TArray<FHitResult>& OutHits);
+
+	UFUNCTION()
+	void PreciseHitsByBisectionMethod(
+		FHitResult& LeftHit,
+		FHitResult& RightHit
+	) const;
 
 	UFUNCTION(
 		BlueprintPure,

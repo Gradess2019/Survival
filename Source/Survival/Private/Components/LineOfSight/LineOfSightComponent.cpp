@@ -104,17 +104,6 @@ void ULineOfSightComponent::LaunchTraces(TArray<FHitResult>& OutHits)
 	OutHits = BaseHits;
 }
 
-bool ULineOfSightComponent::IsAnyHitDistanceEquals(const FHitResult& FirstHit, const FHitResult& SecondHit) const
-{
-	const auto DistanceToX = GetDistanceToX(FirstHit.Location);
-	const auto DistanceToY = GetDistanceToY(FirstHit.Location);
-	
-	const auto NextDistanceToX = GetDistanceToX(SecondHit.Location);
-	const auto NextDistanceToY = GetDistanceToY(SecondHit.Location);
-	
-	return IsAnyDistanceEquals(DistanceToX, DistanceToY, NextDistanceToX, NextDistanceToY);
-}
-
 void ULineOfSightComponent::PreciseHits(TArray<FHitResult>& OutHits)
 {
 	if (BaseHits.Num() <= 0) { return; }
@@ -143,7 +132,7 @@ void ULineOfSightComponent::PreciseHits(TArray<FHitResult>& OutHits)
 			else
 			{
 				// We want to continue checking from previous hit in next iteration, that is why we decrement Id
-				auto LeftHit = BaseHits[Id - 1];
+				auto LeftHit = BaseHits[--Id];
 				auto RightHit = NextBaseHit;
 				
 				PreciseHitsByBisectionMethod(LeftHit, RightHit);
@@ -151,7 +140,6 @@ void ULineOfSightComponent::PreciseHits(TArray<FHitResult>& OutHits)
 				PrecisedHits.Add(LeftHit);
 				PrecisedHits.Add(RightHit);
 
-				Id--;
 				break;
 			}
 		}
@@ -195,6 +183,51 @@ void ULineOfSightComponent::PreciseHitsByBisectionMethod(
 			RightHit = MiddleHit;
 		}
 	}
+}
+
+bool ULineOfSightComponent::IsAngleLessThanPreciseAngle(
+	const FVector& LeftDirection,
+	const FVector& RightDirection
+) const
+{
+	const auto CurrentAngle =
+		UGLibMathLibrary::ShortestAngleBetweenVectorsInDegrees(LeftDirection, RightDirection);
+	if (CurrentAngle <= PreciseAngle) { return true; }
+	
+	return false;
+}
+
+bool ULineOfSightComponent::IsAnyDistanceEquals(
+	const float FirstDistanceToX,
+	const float FirstDistanceToY,
+	const float SecondDistanceToX,
+	const float SecondDistanceToY
+) const
+{
+	return
+		FMath::IsNearlyEqual(FirstDistanceToX, SecondDistanceToX, ErrorTolerance) ||
+		FMath::IsNearlyEqual(FirstDistanceToY, SecondDistanceToY, ErrorTolerance);
+}
+
+bool ULineOfSightComponent::IsAnyHitDistanceEquals(const FHitResult& FirstHit, const FHitResult& SecondHit) const
+{
+	const auto DistanceToX = GetDistanceToX(FirstHit.Location);
+	const auto DistanceToY = GetDistanceToY(FirstHit.Location);
+	
+	const auto NextDistanceToX = GetDistanceToX(SecondHit.Location);
+	const auto NextDistanceToY = GetDistanceToY(SecondHit.Location);
+	
+	return IsAnyDistanceEquals(DistanceToX, DistanceToY, NextDistanceToX, NextDistanceToY);
+}
+
+const TArray<FHitResult>& ULineOfSightComponent::GetBaseHits() const
+{
+	return BaseHits;
+}
+
+const TArray<FHitResult>& ULineOfSightComponent::GetPrecisedHits() const
+{
+	return PrecisedHits;
 }
 
 void ULineOfSightComponent::UpdateSightParams()
@@ -274,38 +307,4 @@ float ULineOfSightComponent::GetDistanceToX(const FVector& Location) const
 float ULineOfSightComponent::GetDistanceToY(const FVector& Location) const
 {
 	return GetDistanceToAxis(FVector::RightVector, Location);
-}
-
-bool ULineOfSightComponent::IsAnyDistanceEquals(
-	const float FirstDistanceToX,
-	const float FirstDistanceToY,
-	const float SecondDistanceToX,
-	const float SecondDistanceToY
-) const
-{
-	return
-		FMath::IsNearlyEqual(FirstDistanceToX, SecondDistanceToX, ErrorTolerance) ||
-		FMath::IsNearlyEqual(FirstDistanceToY, SecondDistanceToY, ErrorTolerance);
-}
-
-const TArray<FHitResult>& ULineOfSightComponent::GetBaseHits() const
-{
-	return BaseHits;
-}
-
-const TArray<FHitResult>& ULineOfSightComponent::GetPrecisedHits() const
-{
-	return PrecisedHits;
-}
-
-bool ULineOfSightComponent::IsAngleLessThanPreciseAngle(
-	const FVector& LeftDirection,
-	const FVector& RightDirection
-) const
-{
-	const auto CurrentAngle =
-		UGLibMathLibrary::ShortestAngleBetweenVectorsInDegrees(LeftDirection, RightDirection);
-	if (CurrentAngle <= PreciseAngle) { return true; }
-	
-	return false;
 }
