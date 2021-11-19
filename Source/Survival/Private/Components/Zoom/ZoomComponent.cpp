@@ -48,3 +48,8 @@ float UZoomComponent::GetTargetLength() const
 	return TargetLength;
 }
 
+USpringArmComponent* UZoomComponent::GetSpringArmComponent() const
+{
+	return SpringArmComponent;
+}
+
