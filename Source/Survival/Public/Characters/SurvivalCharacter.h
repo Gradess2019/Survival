@@ -12,6 +12,7 @@
 class UWalkModeManagerComponent;
 class UCameraComponent;
 class USpringArmComponent;
+class UZoomComponent;
 #pragma endregion Forward declarations
 
 
@@ -98,6 +99,14 @@ protected:
 		Category = "Camera"
 	)
 	UCameraComponent* Camera;
+	
+	/** Follow camera */
+	UPROPERTY(
+		VisibleAnywhere,
+		BlueprintReadOnly,
+		Category = "Zoom"
+	)
+	UZoomComponent* Zoom;
 
 	UPROPERTY(
 		VisibleAnywhere,
