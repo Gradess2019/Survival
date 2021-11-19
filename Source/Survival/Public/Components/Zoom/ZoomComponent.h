@@ -31,6 +31,12 @@ public:
 	void Update();
 
 	UFUNCTION(
+		BlueprintSetter,
+		Category = "ZoomComponent"
+	)
+	void SetTargetLength(const float NewLength);
+
+	UFUNCTION(
 		BlueprintGetter,
 		Category = "ZoomComponent"
 	)
@@ -74,6 +80,7 @@ protected:
 
 	UPROPERTY(
 		BlueprintGetter = "GetTargetLength",
+		BlueprintSetter = "SetTargetLength",
 		Category = "ZoomComponent"
 	)
 	float TargetLength;

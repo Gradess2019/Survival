@@ -26,7 +26,9 @@ void UZoomComponent::InitializeComponent()
 
 void UZoomComponent::AddDelta(const float Delta)
 {
-	TargetLength += Delta * Power * Invert ? -1.f: 1.f;
+	const auto Sign = Invert ? -1.f: 1.f;
+	const auto NewLength = TargetLength + Delta * Power * Sign;
+	SetTargetLength(NewLength);
 }
 
 void UZoomComponent::Update()
@@ -34,6 +36,11 @@ void UZoomComponent::Update()
 	const auto DeltaTime = GetWorld()->DeltaTimeSeconds;
 
 	SpringArmComponent->TargetArmLength = FMath::Lerp(SpringArmComponent->TargetArmLength, TargetLength, DeltaTime * Speed);
+}
+
+void UZoomComponent::SetTargetLength(const float NewLength)
+{
+	TargetLength = FMath::Clamp(NewLength, MinLength, MaxLength);
 }
 
 float UZoomComponent::GetTargetLength() const
