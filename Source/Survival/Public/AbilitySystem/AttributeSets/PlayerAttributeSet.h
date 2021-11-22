@@ -34,19 +34,19 @@ public:
 
 	UPROPERTY(
 		BlueprintReadOnly,
-		ReplicatedUsing = OnRep_Endurance,
+		ReplicatedUsing = OnRep_Tiredness,
 		Category = "Attributes"
 	)
-	FGameplayAttributeData Endurance;
-	ATTRIBUTE_ACCESSORS(UPlayerAttributeSet, Endurance);
+	FGameplayAttributeData Tiredness;
+	ATTRIBUTE_ACCESSORS(UPlayerAttributeSet, Tiredness);
 
 	UPROPERTY(
 		BlueprintReadOnly,
-		ReplicatedUsing = OnRep_MaxEndurance,
+		ReplicatedUsing = OnRep_MaxTiredness,
 		Category = "Attributes"
 	)
-	FGameplayAttributeData MaxEndurance;
-	ATTRIBUTE_ACCESSORS(UPlayerAttributeSet, MaxEndurance);
+	FGameplayAttributeData MaxTiredness;
+	ATTRIBUTE_ACCESSORS(UPlayerAttributeSet, MaxTiredness);
 
 	UPROPERTY(
 		BlueprintReadOnly,
@@ -93,10 +93,10 @@ protected:
 	void OnRep_MaxMovementSpeed(const FGameplayAttributeData& OldValue);
 
 	UFUNCTION()
-	void OnRep_Endurance(const FGameplayAttributeData& OldValue);
+	void OnRep_Tiredness(const FGameplayAttributeData& OldValue);
 
 	UFUNCTION()
-	void OnRep_MaxEndurance(const FGameplayAttributeData& OldValue);
+	void OnRep_MaxTiredness(const FGameplayAttributeData& OldValue);
 
 	UFUNCTION()
 	void OnRep_Thirst(const FGameplayAttributeData& OldValue);
